@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1E88E5</color>
+    <color name="accent">#f1f2f3</color>
+    <color name="list_item_text">#333</color>
+    <color name="toolbar_primary_text">#ffffff</color>
+    <color name="text_color">#000000</color>
+    <color name="full_screen_photo_color">#000000</color>
+</resources>
