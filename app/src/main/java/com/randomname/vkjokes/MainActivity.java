@@ -4,6 +4,9 @@ import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +28,9 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements PublicListFragment.PublicListFragmentCallback {
 
     private final static String FULLSCREEN_FRAGMENT_TAG = "full_screen_tag";
+    private final static String MENU_STATUS_STATE = "menu_status_state";
+    private final static String TOOLBAR_COLOR_STATE = "toolbar_color_state";
+    private final static String STATUS_COLOR_STATE = "window_color_state";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -49,8 +55,39 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                 ft.commit();
             }
         }
+
+        if (savedInstanceState != null) {
+            materialMenu.setTransformationOffset(
+                    MaterialMenuDrawable.AnimationState.BURGER_ARROW,
+                    savedInstanceState.getFloat(MENU_STATUS_STATE)
+            );
+
+            toolbar.setBackgroundColor(savedInstanceState.getInt(TOOLBAR_COLOR_STATE, Color.parseColor("#2196F3")));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(savedInstanceState.getInt(STATUS_COLOR_STATE, Color.parseColor("#1E88E5")));
+            }
+        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putFloat(MENU_STATUS_STATE, materialMenu.getTransformationValue());
+
+        int color = Color.TRANSPARENT;
+        Drawable background = toolbar.getBackground();
+        if (background instanceof ColorDrawable) {
+            color = ((ColorDrawable) background).getColor();
+        }
+
+        outState.putInt(TOOLBAR_COLOR_STATE, color);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            outState.putInt(STATUS_COLOR_STATE, getWindow().getStatusBarColor());
+        }
+
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,6 +140,9 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                     MaterialMenuDrawable.AnimationState.BURGER_ARROW,
                     1
             );
+            animateStatusBar(Color.parseColor("#000000"),
+                    Color.parseColor("#1E88E5")
+            );
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.stay_still, R.anim.slide_out_right);
@@ -135,6 +175,24 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         colorAnimation.start();
     }
 
+    private void animateStatusBar(int colorFrom, int colorTo) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    getWindow().setStatusBarColor((Integer) animator.getAnimatedValue());
+                }
+            });
+
+            colorAnimation.setDuration(350);
+            colorAnimation.setStartDelay(0);
+            colorAnimation.start();
+        }
+    }
+
     private void openFullScreenFragment() {
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentByTag(FULLSCREEN_FRAGMENT_TAG);
@@ -151,6 +209,10 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                     Color.parseColor("#000000"),
                     MaterialMenuDrawable.AnimationState.BURGER_ARROW,
                     0
+            );
+            animateStatusBar(
+                    R.color.primary_dark,
+                    Color.parseColor("#000000")
             );
         }
     }
