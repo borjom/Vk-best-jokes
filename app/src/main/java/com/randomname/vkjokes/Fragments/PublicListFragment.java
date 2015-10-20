@@ -5,22 +5,44 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.randomname.vkjokes.Adapters.WallPostsAdapter;
+import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiPhoto;
+import com.vk.sdk.api.model.VKApiPost;
+import com.vk.sdk.api.model.VKAttachments;
+import com.vk.sdk.api.model.VKPostArray;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class PublicListFragment extends Fragment {
-    @Bind(R.id.button)
-    Button button;
 
-    PublicListFragmentCallback publicListFragmentCallback;
+    private PublicListFragmentCallback publicListFragmentCallback;
+    private WallPostsAdapter adapter;
+    private ArrayList<WallPostModel> wallPostModelArrayList;
+
+    @Bind(R.id.wall_posts_recycler_view)
+    RecyclerView wallPostsRecyclerView;
 
     public PublicListFragment() {
 
@@ -46,12 +68,122 @@ public class PublicListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
+
+        wallPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        if (savedInstanceState == null) {
+            wallPostModelArrayList = new ArrayList<>();
+
+            getWallPosts();
+        }
+
+        adapter = new WallPostsAdapter(getActivity(), wallPostModelArrayList);
+        wallPostsRecyclerView.setAdapter(adapter);
+
         return view;
     }
 
-    @OnClick (R.id.button)
-    public void buttonClick() {
-        publicListFragmentCallback.onButtonClick();
+    private void getWallPosts() {
+        VKParameters params = new VKParameters();
+        params.put("domain", "mdk");
+        params.put("count", "10");
+        params.put("offset", 0);
+
+        final VKRequest request = new VKRequest("wall.get", params);
+
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+
+                VKPostArray posts = new VKPostArray();
+
+                try {
+                    posts.parse(response.json);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                convertVKPostToWallPost(posts);
+            }
+
+            @Override
+            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                super.attemptFailed(request, attemptNumber, totalAttempts);
+
+            }
+
+            @Override
+            public void onError(VKError error) {
+                super.onError(error);
+                Toast.makeText(getActivity(), "ASHIBKA", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void convertVKPostToWallPost(VKPostArray vkPosts) {
+        int size = vkPosts.size();
+
+        for (int i = 0; i < size; i++) {
+            VKApiPost vkApiPost = vkPosts.get(i);
+            WallPostModel wallPostModel = new WallPostModel();
+
+            wallPostModel.setText(vkApiPost.text);
+
+            ArrayList<String> wallPhotos = getWallPhotos(vkApiPost);
+            wallPostModel.setPostPhotos(wallPhotos);
+
+            if (vkApiPost.text.isEmpty()) {
+                wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_HOLDER);
+            } else {
+                wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER);
+            }
+
+            wallPostModelArrayList.add(wallPostModel);
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    private ArrayList<String> getWallPhotos(VKApiPost vkApiPost) {
+        ArrayList<String> output = new ArrayList<>();
+
+        VKAttachments attachments = vkApiPost.attachments;
+
+        if (attachments.isEmpty()) {
+            return output;
+        }
+
+        for (int i = 0; i < attachments.size(); i++) {
+            VKAttachments.VKApiAttachment attachment = attachments.get(i);
+
+            if (!attachment.getType().equals(VKApiConst.PHOTO)) {
+                break;
+            }
+
+            VKApiPhoto vkApiPhoto = (VKApiPhoto)attachment;
+            String url = "";
+
+            url = vkApiPhoto.photo_2560;
+
+            if (url.isEmpty()) {
+                url = vkApiPhoto.photo_1280;
+            }
+
+            if (url.isEmpty()) {
+                url = vkApiPhoto.photo_807;
+            }
+
+            if (url.isEmpty()) {
+                url = vkApiPhoto.photo_604;
+            }
+
+            if (!url.isEmpty()) {
+                output.add(url);
+            }
+        }
+
+        return output;
     }
 
     public interface PublicListFragmentCallback {

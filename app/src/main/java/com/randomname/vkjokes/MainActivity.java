@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragment;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.vk.sdk.util.VKUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initToolbar();
-
         FragmentManager fm = getSupportFragmentManager();
 
         if (fm.getFragments() == null) {
