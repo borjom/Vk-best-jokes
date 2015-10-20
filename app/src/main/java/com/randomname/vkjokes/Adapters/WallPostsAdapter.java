@@ -1,6 +1,7 @@
 package com.randomname.vkjokes.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public final static int MAIN_VIEW_HOLDER = 0;
     public final static int NO_TEXT_MAIN_VIEW_HOLDER = 1;
+    public final static int MAIN_VIEW_HOLDER_MULTIPLE = 2;
+    public final static int NO_TEXT_MAIN_VIEW_MULTIPLE = 3;
 
     public WallPostsAdapter(Context context, ArrayList<WallPostModel> wallPostModelArrayList) {
         this.wallPostModelArrayList = wallPostModelArrayList;
@@ -47,6 +50,14 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.no_text_main_wall_post, null);
                 viewHolder = new NoTextMainHolder(view);
                 break;
+            case MAIN_VIEW_HOLDER_MULTIPLE:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.main_wall_post_multiple_images, null);
+                viewHolder = new MainViewHolderMultipleImages(view);
+                break;
+            case NO_TEXT_MAIN_VIEW_MULTIPLE:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.no_text_wall_post_multiply_images, null);
+                viewHolder = new NoTextMainHolderMultipleImages(view);
+                break;
             default:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.main_wall_post, null);
                 viewHolder = new MainViewHolder(view);
@@ -68,6 +79,12 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case NO_TEXT_MAIN_VIEW_HOLDER:
                 fillNoTextViewHolder(wallPost, viewHolder, i);
                 break;
+            case MAIN_VIEW_HOLDER_MULTIPLE:
+                fillMainViewHolderMultiple(wallPost, viewHolder, i);
+                break;
+            case NO_TEXT_MAIN_VIEW_MULTIPLE:
+                fillNoTextMainViewHolderMultiple(wallPost, viewHolder, i);
+                break;
             default:
                 fillMainViewHolder(wallPost, viewHolder, i);
         }
@@ -88,6 +105,74 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (wallPhotos.size() > 0) {
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+        }
+    }
+
+    private void fillMainViewHolderMultiple(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
+        MainViewHolderMultipleImages customViewHolder = (MainViewHolderMultipleImages) viewHolder;
+
+        customViewHolder.textView.setText(wallPost.getText());
+
+        ArrayList<String> wallPhotos = wallPost.getPostPhotos();
+
+        if (wallPhotos.size() > 0) {
+
+            customViewHolder.mainImage.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage3.setImageResource(android.R.color.transparent);
+
+            for (int y = 0; y < wallPhotos.size(); y++) {
+                String url = wallPhotos.get(y);
+                switch (y) {
+                    case 0:
+                        Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+                        break;
+                    case 1:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
+                        break;
+                    case 2:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
+                        break;
+                    case 3:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
+                        break;
+                    default:
+                }
+            }
+        }
+    }
+
+    private void fillNoTextMainViewHolderMultiple(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
+        NoTextMainHolderMultipleImages customViewHolder = (NoTextMainHolderMultipleImages) viewHolder;
+
+        ArrayList<String> wallPhotos = wallPost.getPostPhotos();
+
+        if (wallPhotos.size() > 0) {
+
+            customViewHolder.mainImage.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
+            customViewHolder.smallImage3.setImageResource(android.R.color.transparent);
+
+            for (int y = 0; y < wallPhotos.size(); y++) {
+                String url = wallPhotos.get(y);
+                switch (y) {
+                    case 0:
+                        Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+                        break;
+                    case 1:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
+                        break;
+                    case 2:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
+                        break;
+                    case 3:
+                        Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
+                        break;
+                    default:
+                }
+            }
         }
     }
 
@@ -118,6 +203,32 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public NoTextMainHolder(View view) {
             super(view);
             this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+        }
+    }
+
+    public class MainViewHolderMultipleImages extends RecyclerView.ViewHolder {
+        protected TextView textView;
+        protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
+
+        public MainViewHolderMultipleImages(View view) {
+            super(view);
+            this.textView = (TextView) view.findViewById(R.id.textView);
+            this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+            this.smallImage1 = (ImageView) view.findViewById(R.id.small_image_1);
+            this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
+            this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
+        }
+    }
+
+    public class NoTextMainHolderMultipleImages extends RecyclerView.ViewHolder {
+        protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
+
+        public NoTextMainHolderMultipleImages(View view) {
+            super(view);
+            this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+            this.smallImage1 = (ImageView) view.findViewById(R.id.small_image_1);
+            this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
+            this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
         }
     }
 }

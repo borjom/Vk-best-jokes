@@ -128,13 +128,20 @@ public class PublicListFragment extends Fragment {
             VKApiPost vkApiPost = vkPosts.get(i);
             WallPostModel wallPostModel = new WallPostModel();
 
-            wallPostModel.setText(vkApiPost.text);
-
             ArrayList<String> wallPhotos = getWallPhotos(vkApiPost);
             wallPostModel.setPostPhotos(wallPhotos);
 
-            if (vkApiPost.text.isEmpty()) {
+            wallPostModel.setText(vkApiPost.text);
+
+            boolean noText = vkApiPost.text.isEmpty();
+            boolean multipleImage = wallPhotos.size() > 1;
+
+            if (noText && multipleImage) {
+                wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_MULTIPLE);
+            } else if(noText && !multipleImage) {
                 wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_HOLDER);
+            } else if (!noText && multipleImage) {
+                wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER_MULTIPLE);
             } else {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER);
             }
