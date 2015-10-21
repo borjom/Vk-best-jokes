@@ -1,6 +1,5 @@
 package com.randomname.vkjokes;
 
-import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
@@ -13,17 +12,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
-import com.randomname.vkjokes.Fragments.FullscreenPhotoFragment;
+import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
-import com.vk.sdk.util.VKUtil;
 
 import java.util.ArrayList;
 
@@ -36,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     private final static String MENU_STATUS_STATE = "menu_status_state";
     private final static String TOOLBAR_COLOR_STATE = "toolbar_color_state";
     private final static String STATUS_COLOR_STATE = "window_color_state";
+    private final static String TOOLBAR_TITLE_STATE = "toolbar_title_state";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -67,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             );
 
             toolbar.setBackgroundColor(savedInstanceState.getInt(TOOLBAR_COLOR_STATE, Color.parseColor("#2196F3")));
+            getSupportActionBar().setTitle(savedInstanceState.getCharSequence(TOOLBAR_TITLE_STATE));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(savedInstanceState.getInt(STATUS_COLOR_STATE, Color.parseColor("#1E88E5")));
@@ -90,29 +87,9 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             outState.putInt(STATUS_COLOR_STATE, getWindow().getStatusBarColor());
         }
 
+        outState.putCharSequence(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle());
+
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -156,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             if (toClose) {
                 getSupportFragmentManager().popBackStack();
             }
+
+            getSupportActionBar().setTitle(R.string.app_name);
         }
     }
 
@@ -219,10 +198,10 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.stay_still);
 
             Bundle data = new Bundle();
-            data.putStringArrayList(FullscreenPhotoFragment.PHOTOS_ARRAY_KEY, wallPhotos);
-            data.putInt(FullscreenPhotoFragment.POSITION_KEY, position);
+            data.putStringArrayList(FullscreenPhotoFragmentHost.PHOTOS_ARRAY_KEY, wallPhotos);
+            data.putInt(FullscreenPhotoFragmentHost.POSITION_KEY, position);
 
-            fragment = FullscreenPhotoFragment.getInstance(data);
+            fragment = FullscreenPhotoFragmentHost.getInstance(data);
             ft.add(R.id.main_frame, fragment, FULLSCREEN_FRAGMENT_TAG);
             ft.addToBackStack(FULLSCREEN_FRAGMENT_TAG);
             ft.commit();
