@@ -7,6 +7,9 @@ public class WallPostModel {
     private String text;
     private ArrayList<String> postPhotos;
     private int type;
+    private int id;
+    private int commentsCount;
+    private int likeCount;
 
     public WallPostModel() {
     }
@@ -33,5 +36,29 @@ public class WallPostModel {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
     }
 }

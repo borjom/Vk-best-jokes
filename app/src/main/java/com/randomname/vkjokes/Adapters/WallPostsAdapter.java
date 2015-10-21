@@ -1,5 +1,6 @@
 package com.randomname.vkjokes.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
 import com.squareup.picasso.Picasso;
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<WallPostModel> wallPostModelArrayList;
     private Context mContext;
+    private PublicListFragment.PublicListFragmentCallback callbacks;
 
     public final static int MAIN_VIEW_HOLDER = 0;
     public final static int NO_TEXT_MAIN_VIEW_HOLDER = 1;
@@ -28,6 +33,16 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public WallPostsAdapter(Context context, ArrayList<WallPostModel> wallPostModelArrayList) {
         this.wallPostModelArrayList = wallPostModelArrayList;
         this.mContext = context;
+
+        if (context instanceof Activity){
+            Activity a = (Activity) context;
+
+            try {
+                callbacks = (PublicListFragment.PublicListFragmentCallback) a;
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -103,16 +118,32 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return (null != wallPostModelArrayList ? wallPostModelArrayList.size() : 0);
     }
 
+    private void onImageClickAction(ArrayList<String> wallPhotos, int position) {
+        if (callbacks != null) {
+            callbacks.onButtonClick(wallPhotos, position);
+        }
+    }
+
+    private void setOnImageClick(View view, final ArrayList<String> wallPhotos, final int position) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onImageClickAction(wallPhotos, position);
+            }
+        });
+    }
+
     private void fillMainViewHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolder customViewHolder = (MainViewHolder) viewHolder;
 
         customViewHolder.textView.setText(wallPost.getText());
 
-        ArrayList<String> wallPhotos = wallPost.getPostPhotos();
+        final ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
         if (wallPhotos.size() > 0) {
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+            setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
         } else {
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
         }
@@ -143,15 +174,19 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 switch (y) {
                     case 0:
                         Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+                        setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
                         break;
                     case 1:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
+                        setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
                         break;
                     case 2:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
+                        setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
                         break;
                     case 3:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
+                        setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
                         break;
                     default:
                 }
@@ -176,15 +211,19 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 switch (y) {
                     case 0:
                         Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+                        setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
                         break;
                     case 1:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
+                        setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
                         break;
                     case 2:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
+                        setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
                         break;
                     case 3:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
+                        setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
                         break;
                     default:
                 }
@@ -199,6 +238,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (wallPhotos.size() > 0) {
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+            setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
         }
     }
 

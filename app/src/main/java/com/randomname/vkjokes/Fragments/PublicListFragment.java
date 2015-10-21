@@ -73,10 +73,8 @@ public class PublicListFragment extends Fragment {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        if (savedInstanceState == null) {
-            wallPostModelArrayList = new ArrayList<>();
-            getWallPosts();
-        }
+        wallPostModelArrayList = new ArrayList<>();
+        getWallPosts();
 
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -159,6 +157,9 @@ public class PublicListFragment extends Fragment {
             wallPostModel.setPostPhotos(wallPhotos);
 
             wallPostModel.setText(vkApiPost.text);
+            wallPostModel.setId(vkApiPost.getId());
+            wallPostModel.setCommentsCount(vkApiPost.comments_count);
+            wallPostModel.setLikeCount(vkApiPost.likes_count);
 
             boolean noText = vkApiPost.text.isEmpty();
             boolean multipleImage = wallPhotos.size() > 1;
@@ -223,6 +224,6 @@ public class PublicListFragment extends Fragment {
     }
 
     public interface PublicListFragmentCallback {
-        public void onButtonClick();
+        public void onButtonClick(ArrayList<String> wallPhotos, int position);
     }
 }

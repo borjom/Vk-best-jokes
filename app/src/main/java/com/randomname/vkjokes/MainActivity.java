@@ -25,6 +25,8 @@ import com.randomname.vkjokes.Fragments.FullscreenPhotoFragment;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.vk.sdk.util.VKUtil;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -209,13 +211,18 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         }
     }
 
-    private void openFullScreenFragment() {
+    private void openFullScreenFragment(ArrayList<String> wallPhotos, int position) {
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentByTag(FULLSCREEN_FRAGMENT_TAG);
         if (fragment == null) {
             FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.stay_still);
-            fragment = new FullscreenPhotoFragment();
+
+            Bundle data = new Bundle();
+            data.putStringArrayList(FullscreenPhotoFragment.PHOTOS_ARRAY_KEY, wallPhotos);
+            data.putInt(FullscreenPhotoFragment.POSITION_KEY, position);
+
+            fragment = FullscreenPhotoFragment.getInstance(data);
             ft.add(R.id.main_frame, fragment, FULLSCREEN_FRAGMENT_TAG);
             ft.addToBackStack(FULLSCREEN_FRAGMENT_TAG);
             ft.commit();
@@ -234,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     }
 
     @Override
-    public void onButtonClick() {
-        openFullScreenFragment();
+    public void onButtonClick(ArrayList<String> wallPhotos, int position) {
+        openFullScreenFragment(wallPhotos, position);
     }
 
 }
