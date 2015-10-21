@@ -10,6 +10,7 @@ public class WallPostModel {
     private int id;
     private int commentsCount;
     private int likeCount;
+    private String date;
 
     public WallPostModel() {
     }
@@ -60,5 +61,13 @@ public class WallPostModel {
 
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

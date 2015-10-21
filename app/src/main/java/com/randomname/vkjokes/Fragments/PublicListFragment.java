@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import com.randomname.vkjokes.Adapters.WallPostsAdapter;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -30,6 +32,7 @@ import com.vk.sdk.api.model.VKPostArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -40,7 +43,7 @@ public class PublicListFragment extends Fragment {
     private PublicListFragmentCallback publicListFragmentCallback;
     private WallPostsAdapter adapter;
     private ArrayList<WallPostModel> wallPostModelArrayList;
-    private LinearLayoutManager mLinearLayoutManager;
+    private PreCachingLayoutManager preCachingLayoutManager;
 
     private int offset = 0;
     private boolean loading = false;
@@ -76,9 +79,9 @@ public class PublicListFragment extends Fragment {
         wallPostModelArrayList = new ArrayList<>();
         getWallPosts();
 
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        preCachingLayoutManager = new PreCachingLayoutManager(getActivity());
 
-        wallPostsRecyclerView.setLayoutManager(mLinearLayoutManager);
+        wallPostsRecyclerView.setLayoutManager(preCachingLayoutManager);
         adapter = new WallPostsAdapter(getActivity(), wallPostModelArrayList);
         wallPostsRecyclerView.setAdapter(adapter);
 
@@ -87,9 +90,9 @@ public class PublicListFragment extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                int visibleItemCount = mLinearLayoutManager.getChildCount();
-                int totalItemCount = mLinearLayoutManager.getItemCount();
-                int pastVisiblesItems = mLinearLayoutManager.findFirstVisibleItemPosition();
+                int visibleItemCount = preCachingLayoutManager.getChildCount();
+                int totalItemCount = preCachingLayoutManager.getItemCount();
+                int pastVisiblesItems = preCachingLayoutManager.findFirstVisibleItemPosition();
 
                 if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                     if (!loading) {
@@ -160,6 +163,15 @@ public class PublicListFragment extends Fragment {
             wallPostModel.setId(vkApiPost.getId());
             wallPostModel.setCommentsCount(vkApiPost.comments_count);
             wallPostModel.setLikeCount(vkApiPost.likes_count);
+
+            if (vkApiPost.date > 0) {
+                long millisecond = vkApiPost.date * 1000;
+                String dateString= DateFormat.format("dd MMMM kk:mm", new Date(millisecond)).toString();
+
+                wallPostModel.setDate(dateString);
+            } else {
+                wallPostModel.setDate("");
+            }
 
             boolean noText = vkApiPost.text.isEmpty();
             boolean multipleImage = wallPhotos.size() > 1;

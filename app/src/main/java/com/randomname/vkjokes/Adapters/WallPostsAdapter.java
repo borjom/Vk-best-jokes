@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,7 +16,10 @@ import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Views.WallPostViewHolder;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -92,24 +96,27 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         int type = wallPost.getType();
 
+        WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
+        holder.dateTextView.setText(wallPost.getDate());
+
         switch (type) {
             case MAIN_VIEW_HOLDER:
-                fillMainViewHolder(wallPost, viewHolder, i);
+                fillMainViewHolder(wallPost, holder, i);
                 break;
             case NO_TEXT_MAIN_VIEW_HOLDER:
-                fillNoTextViewHolder(wallPost, viewHolder, i);
+                fillNoTextViewHolder(wallPost, holder, i);
                 break;
             case MAIN_VIEW_HOLDER_MULTIPLE:
-                fillMainViewHolderMultiple(wallPost, viewHolder, i);
+                fillMainViewHolderMultiple(wallPost, holder, i);
                 break;
             case NO_TEXT_MAIN_VIEW_MULTIPLE:
-                fillNoTextMainViewHolderMultiple(wallPost, viewHolder, i);
+                fillNoTextMainViewHolderMultiple(wallPost, holder, i);
                 break;
             case NO_PHOTO_MAIN_HOLDER:
-                fillNoPhotoMainHolder(wallPost, viewHolder, i);
+                fillNoPhotoMainHolder(wallPost, holder, i);
                 break;
             default:
-                fillMainViewHolder(wallPost, viewHolder, i);
+                fillMainViewHolder(wallPost, holder, i);
         }
     }
 
@@ -164,6 +171,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (wallPhotos.size() > 0) {
 
+            customViewHolder.smallImage2.setVisibility(View.GONE);
+            customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
@@ -181,12 +190,15 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
                         break;
                     case 2:
+                        customViewHolder.smallImage2.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
                         setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
                         break;
                     case 3:
+                        customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
+                        customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
                         break;
                     default:
                 }
@@ -201,6 +213,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (wallPhotos.size() > 0) {
 
+            customViewHolder.smallImage2.setVisibility(View.GONE);
+            customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
@@ -218,12 +232,15 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
                         break;
                     case 2:
+                        customViewHolder.smallImage2.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
                         setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
                         break;
                     case 3:
+                        customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
+                        customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
                         break;
                     default:
                 }
@@ -242,7 +259,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public class MainViewHolder extends RecyclerView.ViewHolder {
+    public class MainViewHolder extends WallPostViewHolder {
         protected TextView textView;
         protected ImageView mainImage;
 
@@ -253,7 +270,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public class NoPhotoMainHolder extends RecyclerView.ViewHolder {
+    public class NoPhotoMainHolder extends WallPostViewHolder {
         protected TextView textView;
 
         public NoPhotoMainHolder(View view) {
@@ -262,7 +279,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public class NoTextMainHolder extends RecyclerView.ViewHolder {
+    public class NoTextMainHolder extends WallPostViewHolder {
         protected ImageView mainImage;
 
         public NoTextMainHolder(View view) {
@@ -271,29 +288,36 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public class MainViewHolderMultipleImages extends RecyclerView.ViewHolder {
-        protected TextView textView;
+    public class MainViewHolderMultipleImages extends WallPostViewHolder {
+        protected TextView textView, morePhoto;
         protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
+        protected RelativeLayout smallImage3Wrapper;
 
         public MainViewHolderMultipleImages(View view) {
             super(view);
             this.textView = (TextView) view.findViewById(R.id.textView);
+            this.morePhoto = (TextView) view.findViewById(R.id.more_photo_text_view);
             this.mainImage = (ImageView) view.findViewById(R.id.main_image);
             this.smallImage1 = (ImageView) view.findViewById(R.id.small_image_1);
             this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
+            this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
         }
     }
 
-    public class NoTextMainHolderMultipleImages extends RecyclerView.ViewHolder {
+    public class NoTextMainHolderMultipleImages extends WallPostViewHolder {
+        protected TextView morePhoto;
         protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
+        protected RelativeLayout smallImage3Wrapper;
 
         public NoTextMainHolderMultipleImages(View view) {
             super(view);
             this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+            this.morePhoto = (TextView) view.findViewById(R.id.more_photo_text_view);
             this.smallImage1 = (ImageView) view.findViewById(R.id.small_image_1);
             this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
+            this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
         }
     }
 }

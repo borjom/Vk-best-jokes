@@ -26,6 +26,12 @@
             android:padding="8dp"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/date_text_view"
+                />
+
             <com.randomname.vkjokes.Views.ProportionalImageView
                 android:layout_marginTop="4dp"
                 android:id="@+id/main_image"
@@ -42,7 +48,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/small_image_1"
                     android:adjustViewBounds="true"
@@ -51,21 +57,45 @@
                     android:layout_weight="1" />
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:id="@+id/small_image_2"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:layout_weight="1" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/small_image_3_layout"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/small_image_3"
                     android:paddingLeft="2dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop"
-                    android:layout_weight="1" />
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/small_image_3"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#000000"
+                        android:alpha="0.7"
+                        />
+
+                    <TextView
+                        android:id="@+id/more_photo_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/accent"
+                        android:layout_centerInParent="true"
+                        android:textSize="20sp"
+                        />
+
+                </RelativeLayout>
 
             </LinearLayout>
 

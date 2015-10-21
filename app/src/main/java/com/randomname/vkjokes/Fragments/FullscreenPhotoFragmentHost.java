@@ -1,5 +1,8 @@
 package com.randomname.vkjokes.Fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -33,8 +37,13 @@ public class FullscreenPhotoFragmentHost extends Fragment {
 
     private PhotosAdapter adapter;
 
+    private Bitmap b = null;
+
     @Bind(R.id.viewPager)
     ViewPager viewPager;
+
+    @Bind(R.id.dummy_background_image)
+    ImageView dummyBackground;
 
     public FullscreenPhotoFragmentHost() {
     }
@@ -77,6 +86,29 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         outState.putInt(POSITION_KEY, viewPager.getCurrentItem());
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        b = loadBitmapFromView(getView());
+        super.onPause();
+    }
+
+    public static Bitmap loadBitmapFromView(View v) {
+        Bitmap b = Bitmap.createBitmap(v.getWidth(),
+                v.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        v.layout(0, 0, v.getWidth(),
+                v.getHeight());
+        v.draw(c);
+        return b;
+    }
+
+    @Override
+    public void onDestroyView() {
+        dummyBackground.setImageBitmap(b);
+        b = null;
+        super.onDestroyView();
     }
 
     @OnPageChange(R.id.viewPager)
