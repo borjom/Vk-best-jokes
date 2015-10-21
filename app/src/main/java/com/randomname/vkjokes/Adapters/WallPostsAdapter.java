@@ -98,6 +98,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
         holder.dateTextView.setText(wallPost.getDate());
+        holder.commentCountTextView.setText(wallPost.getCommentsCount() + " комментарий\n");
+        holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
 
         switch (type) {
             case MAIN_VIEW_HOLDER:

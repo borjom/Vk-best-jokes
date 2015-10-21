@@ -137,6 +137,11 @@ public class PublicListFragment extends Fragment {
             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                 super.attemptFailed(request, attemptNumber, totalAttempts);
                 loading = false;
+
+                if (getActivity() == null) {
+                    return;
+                }
+
                 Toast.makeText(getActivity(), "Произошла ошибка, новая попытка подключиться", Toast.LENGTH_SHORT).show();
             }
 
@@ -144,6 +149,11 @@ public class PublicListFragment extends Fragment {
             public void onError(VKError error) {
                 super.onError(error);
                 loading = false;
+
+                if (getActivity() == null) {
+                    return;
+                }
+
                 Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
             }
         });
@@ -189,9 +199,8 @@ public class PublicListFragment extends Fragment {
             }
 
             wallPostModelArrayList.add(wallPostModel);
+            adapter.notifyItemInserted(wallPostModelArrayList.size() - 1);
         }
-
-        adapter.notifyDataSetChanged();
     }
 
     private ArrayList<String> getWallPhotos(VKApiPost vkApiPost) {
