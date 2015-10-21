@@ -33,14 +33,14 @@
                 android:id="@+id/textView"
                 android:layout_gravity="center_horizontal" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <com.randomname.vkjokes.Views.ProportionalImageView
                 android:layout_marginTop="4dp"
                 android:id="@+id/main_image"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                android:layout_gravity="center_horizontal" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"  />
 
         </LinearLayout>
 

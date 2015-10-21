@@ -23,6 +23,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public final static int NO_TEXT_MAIN_VIEW_HOLDER = 1;
     public final static int MAIN_VIEW_HOLDER_MULTIPLE = 2;
     public final static int NO_TEXT_MAIN_VIEW_MULTIPLE = 3;
+    public final static int NO_PHOTO_MAIN_HOLDER = 4;
 
     public WallPostsAdapter(Context context, ArrayList<WallPostModel> wallPostModelArrayList) {
         this.wallPostModelArrayList = wallPostModelArrayList;
@@ -58,6 +59,10 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.no_text_wall_post_multiply_images, null);
                 viewHolder = new NoTextMainHolderMultipleImages(view);
                 break;
+            case NO_PHOTO_MAIN_HOLDER:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.no_photo_text, null);
+                viewHolder = new NoPhotoMainHolder(view);
+                break;
             default:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.main_wall_post, null);
                 viewHolder = new MainViewHolder(view);
@@ -85,6 +90,9 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case NO_TEXT_MAIN_VIEW_MULTIPLE:
                 fillNoTextMainViewHolderMultiple(wallPost, viewHolder, i);
                 break;
+            case NO_PHOTO_MAIN_HOLDER:
+                fillNoPhotoMainHolder(wallPost, viewHolder, i);
+                break;
             default:
                 fillMainViewHolder(wallPost, viewHolder, i);
         }
@@ -105,7 +113,15 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (wallPhotos.size() > 0) {
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
+        } else {
+            customViewHolder.mainImage.setImageResource(android.R.color.transparent);
         }
+    }
+
+    private void fillNoPhotoMainHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
+        NoPhotoMainHolder customViewHolder = (NoPhotoMainHolder) viewHolder;
+
+        customViewHolder.textView.setText(wallPost.getText());
     }
 
     private void fillMainViewHolderMultiple(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
@@ -194,6 +210,15 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             super(view);
             this.textView = (TextView) view.findViewById(R.id.textView);
             this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+        }
+    }
+
+    public class NoPhotoMainHolder extends RecyclerView.ViewHolder {
+        protected TextView textView;
+
+        public NoPhotoMainHolder(View view) {
+            super(view);
+            this.textView = (TextView) view.findViewById(R.id.textView);
         }
     }
 

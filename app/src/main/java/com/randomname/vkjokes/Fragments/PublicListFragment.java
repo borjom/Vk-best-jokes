@@ -40,6 +40,10 @@ public class PublicListFragment extends Fragment {
     private PublicListFragmentCallback publicListFragmentCallback;
     private WallPostsAdapter adapter;
     private ArrayList<WallPostModel> wallPostModelArrayList;
+    private LinearLayoutManager mLinearLayoutManager;
+
+    private int offset = 0;
+    private boolean loading = false;
 
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
@@ -69,16 +73,34 @@ public class PublicListFragment extends Fragment {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        wallPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         if (savedInstanceState == null) {
             wallPostModelArrayList = new ArrayList<>();
-
             getWallPosts();
         }
 
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+
+        wallPostsRecyclerView.setLayoutManager(mLinearLayoutManager);
         adapter = new WallPostsAdapter(getActivity(), wallPostModelArrayList);
         wallPostsRecyclerView.setAdapter(adapter);
+
+        wallPostsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int visibleItemCount = mLinearLayoutManager.getChildCount();
+                int totalItemCount = mLinearLayoutManager.getItemCount();
+                int pastVisiblesItems = mLinearLayoutManager.findFirstVisibleItemPosition();
+
+                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                    if (!loading) {
+                        loading = true;
+                        getWallPosts();
+                    }
+                }
+            }
+        });
 
         return view;
     }
@@ -87,7 +109,7 @@ public class PublicListFragment extends Fragment {
         VKParameters params = new VKParameters();
         params.put("domain", "mdk");
         params.put("count", "10");
-        params.put("offset", 0);
+        params.put("offset", offset);
 
         final VKRequest request = new VKRequest("wall.get", params);
 
@@ -105,18 +127,23 @@ public class PublicListFragment extends Fragment {
                 }
 
                 convertVKPostToWallPost(posts);
+
+                offset += 10;
+                loading = false;
             }
 
             @Override
             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                 super.attemptFailed(request, attemptNumber, totalAttempts);
-
+                loading = false;
+                Toast.makeText(getActivity(), "Произошла ошибка, новая попытка подключиться", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(VKError error) {
                 super.onError(error);
-                Toast.makeText(getActivity(), "ASHIBKA", Toast.LENGTH_SHORT).show();
+                loading = false;
+                Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -142,6 +169,8 @@ public class PublicListFragment extends Fragment {
                 wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_HOLDER);
             } else if (!noText && multipleImage) {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER_MULTIPLE);
+            } else if (!noText && wallPhotos.size() == 0) {
+                wallPostModel.setType(WallPostsAdapter.NO_PHOTO_MAIN_HOLDER);
             } else {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER);
             }
