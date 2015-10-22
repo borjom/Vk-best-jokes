@@ -18,6 +18,11 @@ import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Views.WallPostViewHolder;
 import com.squareup.picasso.Picasso;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
 
 import org.w3c.dom.Text;
 
@@ -91,15 +96,63 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-        WallPostModel wallPost = wallPostModelArrayList.get(i);
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
+        final WallPostModel wallPost = wallPostModelArrayList.get(i);
 
         int type = wallPost.getType();
 
-        WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
+        final WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
         holder.dateTextView.setText(wallPost.getDate());
         holder.commentCountTextView.setText(wallPost.getCommentsCount() + " комментарий\n");
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+
+        if (!VKSdk.isLoggedIn()) {
+            holder.likeButton.setImageResource(R.drawable.disabled_like);
+        } else if (wallPost.getAlreadyLiked()) {
+            holder.likeButton.setImageResource(R.drawable.active_like);
+        } else {
+            holder.likeButton.setImageResource(R.drawable.empty_like);
+        }
+
+        holder.likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VKParameters params = new VKParameters();
+                params.put("type", "post");
+                params.put("owner_id", wallPost.getFromId());
+                params.put("item_id", wallPost.getId());
+
+                String requestType;
+                if (wallPost.getAlreadyLiked()) {
+                    requestType = "likes.delete";
+                    wallPost.setLikeCount(wallPost.getLikeCount() - 1);
+                    wallPost.setAlreadyLiked(false);
+                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                    holder.likeButton.setImageResource(R.drawable.empty_like);
+                } else {
+                    requestType = "likes.add";
+                    wallPost.setLikeCount(wallPost.getLikeCount() + 1);
+                    wallPost.setAlreadyLiked(true);
+                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                    holder.likeButton.setImageResource(R.drawable.active_like);
+                }
+
+                final VKRequest request = new VKRequest(requestType, params);
+                request.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        super.onComplete(response);
+                        wallPostModelArrayList.set(i, wallPost);
+                    }
+
+                    @Override
+                    public void onError(VKError error) {
+                        super.onError(error);
+                        Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
 
         switch (type) {
             case MAIN_VIEW_HOLDER:

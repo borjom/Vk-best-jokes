@@ -173,6 +173,9 @@ public class PublicListFragment extends Fragment {
             wallPostModel.setId(vkApiPost.getId());
             wallPostModel.setCommentsCount(vkApiPost.comments_count);
             wallPostModel.setLikeCount(vkApiPost.likes_count);
+            wallPostModel.setAlreadyLiked(vkApiPost.user_likes);
+            wallPostModel.setCanLike(vkApiPost.can_like);
+            wallPostModel.setFromId(vkApiPost.from_id);
 
             if (vkApiPost.date > 0) {
                 long millisecond = vkApiPost.date * 1000;

@@ -19,6 +19,7 @@ import android.view.View;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.vk.sdk.VKSdk;
 
 import java.util.ArrayList;
 
@@ -68,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(savedInstanceState.getInt(STATUS_COLOR_STATE, Color.parseColor("#1E88E5")));
             }
+        }
+
+        if (!VKSdk.isLoggedIn()) {
+            VKSdk.login(this, "wall");
         }
     }
 

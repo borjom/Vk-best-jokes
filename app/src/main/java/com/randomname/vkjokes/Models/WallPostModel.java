@@ -11,6 +11,9 @@ public class WallPostModel {
     private int commentsCount;
     private int likeCount;
     private String date;
+    private boolean alreadyLiked;
+    private boolean canLike;
+    private int fromId;
 
     public WallPostModel() {
     }
@@ -69,5 +72,29 @@ public class WallPostModel {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public boolean getAlreadyLiked() {
+        return alreadyLiked;
+    }
+
+    public void setAlreadyLiked(boolean alreadyLiked) {
+        this.alreadyLiked = alreadyLiked;
+    }
+
+    public boolean getCanLike() {
+        return canLike;
+    }
+
+    public void setCanLike(boolean canLike) {
+        this.canLike = canLike;
+    }
+
+    public int getFromId() {
+        return fromId;
+    }
+
+    public void setFromId(int fromId) {
+        this.fromId = fromId;
     }
 }
