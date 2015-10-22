@@ -16,6 +16,7 @@ import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.WallPostViewHolder;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
@@ -100,10 +101,14 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         final WallPostModel wallPost = wallPostModelArrayList.get(i);
 
         int type = wallPost.getType();
+        int count = wallPost.getCommentsCount();
+        String[] titles = {"комментарий", "комментария", "комментариев"};
+
+        String commentCount = count + " " + StringUtils.declarationOfNum(count, titles) + "\n";
 
         final WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
         holder.dateTextView.setText(wallPost.getDate());
-        holder.commentCountTextView.setText(wallPost.getCommentsCount() + " комментарий\n");
+        holder.commentCountTextView.setText(commentCount);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
 
         if (!VKSdk.isLoggedIn()) {
