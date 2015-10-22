@@ -3,13 +3,16 @@ package com.randomname.vkjokes.Fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.randomname.vkjokes.Adapters.PhotoCommentsAdapter;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
@@ -20,6 +23,7 @@ import com.vk.sdk.api.model.VKPostArray;
 
 import org.json.JSONException;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class CommentsFragment extends Fragment {
@@ -28,6 +32,13 @@ public class CommentsFragment extends Fragment {
 
     private WallPostModel wallPostModel;
     private boolean loading = false;
+    private VKCommentArray vkCommentsArray;
+
+    @Bind(R.id.comments_recycler_view)
+    RecyclerView recyclerView;
+
+    PhotoCommentsAdapter adapter;
+    PreCachingLayoutManager preCachingLayoutManager;
 
     public CommentsFragment() {
     }
@@ -48,6 +59,15 @@ public class CommentsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.comments_fragment, container, false);
         ButterKnife.bind(this, view);
+
+        vkCommentsArray = new VKCommentArray();
+
+        preCachingLayoutManager = new PreCachingLayoutManager(getActivity());
+        recyclerView.setLayoutManager(preCachingLayoutManager);
+
+        adapter = new PhotoCommentsAdapter(getActivity(), vkCommentsArray);
+
+        recyclerView.setAdapter(adapter);
 
         getComments();
         return view;
@@ -76,8 +96,9 @@ public class CommentsFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 loading = false;
+                vkCommentsArray.addAll(comments);
+                adapter.notifyDataSetChanged();
             }
 
             @Override

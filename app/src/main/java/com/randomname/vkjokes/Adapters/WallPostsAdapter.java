@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,11 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiVideo;
+import com.vk.sdk.api.model.VKList;
+import com.vk.sdk.api.model.VKPostArray;
 
+import org.json.JSONException;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -168,7 +173,12 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             });
         } else {
-            Toast.makeText(mContext, "Zargsa", Toast.LENGTH_SHORT).show();
+            holder.likeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "Zargsa", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         switch (type) {
@@ -404,4 +414,5 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.alphaView = (View) view.findViewById(R.id.alpha_view);
         }
     }
+
 }

@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         }
 
         if (!VKSdk.isLoggedIn()) {
-            VKSdk.login(this, "wall");
+            VKSdk.login(this, "wall, video");
         }
     }
 

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,10 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiPhoto;
 import com.vk.sdk.api.model.VKApiPost;
+import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKAttachments;
+import com.vk.sdk.api.model.VKCommentArray;
+import com.vk.sdk.api.model.VKList;
 import com.vk.sdk.api.model.VKPostArray;
 
 import org.json.JSONException;
@@ -145,7 +149,6 @@ public class PublicListFragment extends Fragment {
         params.put("offset", offset);
 
         final VKRequest request = new VKRequest("wall.get", params);
-
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -168,7 +171,6 @@ public class PublicListFragment extends Fragment {
             @Override
             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                 super.attemptFailed(request, attemptNumber, totalAttempts);
-                loading = false;
 
                 if (getActivity() == null) {
                     return;
@@ -198,8 +200,11 @@ public class PublicListFragment extends Fragment {
             VKApiPost vkApiPost = vkPosts.get(i);
             WallPostModel wallPostModel = new WallPostModel();
 
-            ArrayList<String> wallPhotos = getWallPhotos(vkApiPost);
-            wallPostModel.setPostPhotos(wallPhotos);
+            boolean toBreak = setWallModelAttachments(vkApiPost, wallPostModel);
+
+            if (toBreak) {
+                continue;
+            }
 
             wallPostModel.setText(vkApiPost.text);
             wallPostModel.setId(vkApiPost.getId());
@@ -219,7 +224,8 @@ public class PublicListFragment extends Fragment {
             }
 
             boolean noText = vkApiPost.text.isEmpty();
-            boolean multipleImage = wallPhotos.size() > 1;
+            boolean multipleImage = wallPostModel.getPostPhotos().size() > 1;
+            boolean noPhotos = wallPostModel.getPostPhotos().size() == 0;
 
             if (noText && multipleImage) {
                 wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_MULTIPLE);
@@ -227,7 +233,7 @@ public class PublicListFragment extends Fragment {
                 wallPostModel.setType(WallPostsAdapter.NO_TEXT_MAIN_VIEW_HOLDER);
             } else if (!noText && multipleImage) {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER_MULTIPLE);
-            } else if (!noText && wallPhotos.size() == 0) {
+            } else if (!noText && noPhotos) {
                 wallPostModel.setType(WallPostsAdapter.NO_PHOTO_MAIN_HOLDER);
             } else {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER);
@@ -238,45 +244,49 @@ public class PublicListFragment extends Fragment {
         }
     }
 
-    private ArrayList<String> getWallPhotos(VKApiPost vkApiPost) {
-        ArrayList<String> output = new ArrayList<>();
-
+    private boolean setWallModelAttachments(VKApiPost vkApiPost, WallPostModel wallPostModel) {
         VKAttachments attachments = vkApiPost.attachments;
-
-        if (attachments.isEmpty()) {
-            return output;
+        ArrayList<String> wallPostPhotos = new ArrayList<>();
+        wallPostModel.setPostPhotos(wallPostPhotos);
+        if (vkApiPost.copy_history.size() > 0) {
+            return true;
         }
 
         for (int i = 0; i < attachments.size(); i++) {
             VKAttachments.VKApiAttachment attachment = attachments.get(i);
+            if (attachment.getType().equals(VKApiConst.PHOTO)) {
+                String photo = getWallPhoto(attachment);
 
-            if (!attachment.getType().equals(VKApiConst.PHOTO)) {
-                break;
-            }
-
-            VKApiPhoto vkApiPhoto = (VKApiPhoto)attachment;
-            String url = "";
-
-            url = vkApiPhoto.photo_2560;
-
-            if (url.isEmpty()) {
-                url = vkApiPhoto.photo_1280;
-            }
-
-            if (url.isEmpty()) {
-                url = vkApiPhoto.photo_807;
-            }
-
-            if (url.isEmpty()) {
-                url = vkApiPhoto.photo_604;
-            }
-
-            if (!url.isEmpty()) {
-                output.add(url);
+                if (!photo.isEmpty()) {
+                    wallPostPhotos.add(photo);
+                }
+            } else {
+                return true;
             }
         }
+        wallPostModel.setPostPhotos(wallPostPhotos);
+        return false;
+    }
 
-        return output;
+    private String getWallPhoto(VKAttachments.VKApiAttachment attachment) {
+        VKApiPhoto vkApiPhoto = (VKApiPhoto) attachment;
+        String url = "";
+
+        url = vkApiPhoto.photo_2560;
+
+        if (url.isEmpty()) {
+            url = vkApiPhoto.photo_1280;
+        }
+
+        if (url.isEmpty()) {
+            url = vkApiPhoto.photo_807;
+        }
+
+        if (url.isEmpty()) {
+            url = vkApiPhoto.photo_604;
+        }
+
+        return url;
     }
 
     public interface PublicListFragmentCallback {

@@ -3,6 +3,9 @@ package com.randomname.vkjokes.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.vk.sdk.api.model.VKApiPost;
+import com.vk.sdk.api.model.VKApiVideo;
+
 import java.util.ArrayList;
 
 public class WallPostModel implements Parcelable {
