@@ -17,6 +17,7 @@ import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Util.StringUtils;
+import com.randomname.vkjokes.Views.ProportionalImageView;
 import com.randomname.vkjokes.Views.WallPostViewHolder;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
@@ -104,7 +105,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         int count = wallPost.getCommentsCount();
         String[] titles = {"комментарий", "комментария", "комментариев"};
 
-        String commentCount = count + " " + StringUtils.declarationOfNum(count, titles) + "\n";
+        String commentCount = count + " " + StringUtils.declarationOfNum(count, titles);
 
         final WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
         holder.dateTextView.setText(wallPost.getDate());
@@ -258,7 +259,9 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
-                        customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                        if (wallPhotos.size() > 4) {
+                            customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                        }
                         break;
                     default:
                 }
@@ -300,7 +303,9 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
-                        customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                        if (wallPhotos.size() > 4) {
+                            customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                        }
                         break;
                     default:
                 }
