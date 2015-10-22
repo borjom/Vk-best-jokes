@@ -3,6 +3,7 @@ package com.randomname.vkjokes.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,6 +44,10 @@ import butterknife.OnClick;
 
 public class PublicListFragment extends Fragment {
 
+    final String WALL_POSTS_KEY = "wallPostsKey";
+    final String RECYCLER_STATE_KEY = "recyclerStateKey";
+    final String REQUEST_OFFSET_KEY = "requestOffsetKey";
+
     private PublicListFragmentCallback publicListFragmentCallback;
     private WallPostsAdapter adapter;
     private ArrayList<WallPostModel> wallPostModelArrayList;
@@ -78,9 +83,7 @@ public class PublicListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
-
         wallPostModelArrayList = new ArrayList<>();
-        getWallPosts();
 
         preCachingLayoutManager = new PreCachingLayoutManager(getActivity());
 
@@ -106,7 +109,33 @@ public class PublicListFragment extends Fragment {
             }
         });
 
+        if (savedInstanceState == null) {
+            getWallPosts();
+        } else {
+            ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
+
+            if (restoredList != null) {
+                wallPostModelArrayList.addAll(restoredList);
+            }
+
+            Parcelable recyclerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
+            preCachingLayoutManager.onRestoreInstanceState(recyclerState);
+            offset = savedInstanceState.getInt(REQUEST_OFFSET_KEY);
+        }
+
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(WALL_POSTS_KEY, wallPostModelArrayList);
+
+        Parcelable mListState = preCachingLayoutManager.onSaveInstanceState();
+        outState.putParcelable(RECYCLER_STATE_KEY, mListState);
+
+        outState.putInt(REQUEST_OFFSET_KEY, offset);
+
+        super.onSaveInstanceState(outState);
     }
 
     private void getWallPosts() {
