@@ -1,6 +1,7 @@
 package com.randomname.vkjokes.Adapters;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
@@ -124,62 +126,59 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             }
         });
 
-        if (!VKSdk.isLoggedIn()) {
-            holder.likeButton.setImageResource(R.drawable.disabled_like);
-        } else if (wallPost.getAlreadyLiked()) {
+        holder.commentCountTextView.setVisibility(View.INVISIBLE);
+
+        if (wallPost.getAlreadyLiked()) {
             holder.likeButton.setImageResource(R.drawable.active_like);
         } else {
             holder.likeButton.setImageResource(R.drawable.empty_like);
         }
 
-        if (VKSdk.isLoggedIn()) {
-            holder.likeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    VKParameters params = new VKParameters();
-                    params.put("type", "post");
-                    params.put("owner_id", wallPost.getFromId());
-                    params.put("item_id", wallPost.getId());
+        holder.likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                    String requestType;
-                    if (wallPost.getAlreadyLiked()) {
-                        requestType = "likes.delete";
-                        wallPost.setLikeCount(wallPost.getLikeCount() - 1);
-                        wallPost.setAlreadyLiked(false);
-                        holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
-                        holder.likeButton.setImageResource(R.drawable.empty_like);
-                    } else {
-                        requestType = "likes.add";
-                        wallPost.setLikeCount(wallPost.getLikeCount() + 1);
-                        wallPost.setAlreadyLiked(true);
-                        holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
-                        holder.likeButton.setImageResource(R.drawable.active_like);
+                if (!VKSdk.isLoggedIn()) {
+                    callbacks.showVkAlert();
+                    return;
+                }
+
+                VKParameters params = new VKParameters();
+                params.put("type", "post");
+                params.put("owner_id", wallPost.getFromId());
+                params.put("item_id", wallPost.getId());
+
+                String requestType;
+                if (wallPost.getAlreadyLiked()) {
+                    requestType = "likes.delete";
+                    wallPost.setLikeCount(wallPost.getLikeCount() - 1);
+                    wallPost.setAlreadyLiked(false);
+                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                    holder.likeButton.setImageResource(R.drawable.empty_like);
+                } else {
+                    requestType = "likes.add";
+                    wallPost.setLikeCount(wallPost.getLikeCount() + 1);
+                    wallPost.setAlreadyLiked(true);
+                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                    holder.likeButton.setImageResource(R.drawable.active_like);
+                }
+
+                final VKRequest request = new VKRequest(requestType, params);
+                request.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        super.onComplete(response);
+                        wallPostModelArrayList.set(i, wallPost);
                     }
 
-                    final VKRequest request = new VKRequest(requestType, params);
-                    request.executeWithListener(new VKRequest.VKRequestListener() {
-                        @Override
-                        public void onComplete(VKResponse response) {
-                            super.onComplete(response);
-                            wallPostModelArrayList.set(i, wallPost);
-                        }
-
-                        @Override
-                        public void onError(VKError error) {
-                            super.onError(error);
-                            Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
-        } else {
-            holder.likeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(mContext, "Zargsa", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+                    @Override
+                    public void onError(VKError error) {
+                        super.onError(error);
+                        Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
 
         switch (type) {
             case MAIN_VIEW_HOLDER:

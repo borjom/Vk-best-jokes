@@ -49,12 +49,6 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     @Bind(R.id.dummy_background_image)
     ImageView dummyBackground;
 
-    @Bind(R.id.slide_handler_view)
-    View slideHandlerView;
-
-    @Bind(R.id.main_layout)
-    RelativeLayout mainLayout;
-
     public FullscreenPhotoFragmentHost() {
     }
 

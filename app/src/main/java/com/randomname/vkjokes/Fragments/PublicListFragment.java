@@ -146,6 +146,7 @@ public class PublicListFragment extends Fragment {
         VKParameters params = new VKParameters();
         params.put("domain", "mdk");
         params.put("count", "10");
+        params.put("filter", "owner");
         params.put("offset", offset);
 
         final VKRequest request = new VKRequest("wall.get", params);
@@ -292,5 +293,6 @@ public class PublicListFragment extends Fragment {
     public interface PublicListFragmentCallback {
         public void onButtonClick(ArrayList<String> wallPhotos, int position);
         public void onCommentsClick(WallPostModel wallPostModel);
+        public void showVkAlert();
     }
 }

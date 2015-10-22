@@ -18,11 +18,4 @@
         android:adjustViewBounds="true"
         />
 
-    <View
-        android:layout_width="24dp"
-        android:layout_height="match_parent"
-        android:id="@+id/slide_handler_view"
-        android:background="#333fff"
-        />
-
 </RelativeLayout>
