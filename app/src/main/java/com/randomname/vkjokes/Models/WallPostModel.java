@@ -1,8 +1,11 @@
 package com.randomname.vkjokes.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class WallPostModel {
+public class WallPostModel implements Parcelable {
 
     private String text;
     private ArrayList<String> postPhotos;
@@ -12,10 +15,23 @@ public class WallPostModel {
     private int likeCount;
     private String date;
     private boolean alreadyLiked;
-    private boolean canLike;
+    private boolean canPost;
     private int fromId;
 
     public WallPostModel() {
+    }
+
+    public WallPostModel(Parcel in) {
+        text = in.readString();
+        postPhotos = (ArrayList<String>) in.readSerializable();
+        type = in.readInt();
+        id = in.readInt();
+        commentsCount = in.readInt();
+        likeCount = in.readInt();
+        date = in.readString();
+        alreadyLiked = in.readByte() != 0;
+        canPost = in.readByte() != 0;
+        fromId = in.readInt();
     }
 
     public String getText() {
@@ -82,12 +98,12 @@ public class WallPostModel {
         this.alreadyLiked = alreadyLiked;
     }
 
-    public boolean getCanLike() {
-        return canLike;
+    public boolean getCanPost() {
+        return canPost;
     }
 
-    public void setCanLike(boolean canLike) {
-        this.canLike = canLike;
+    public void setCanPost(boolean canPost) {
+        this.canPost = canPost;
     }
 
     public int getFromId() {
@@ -97,4 +113,33 @@ public class WallPostModel {
     public void setFromId(int fromId) {
         this.fromId = fromId;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(text);
+        dest.writeSerializable(postPhotos);
+        dest.writeInt(type);
+        dest.writeInt(id);
+        dest.writeInt(commentsCount);
+        dest.writeInt(likeCount);
+        dest.writeString(date);
+        dest.writeByte((byte) (alreadyLiked ? 1 : 0));
+        dest.writeByte((byte) (canPost ? 1 : 0));
+        dest.writeInt(fromId);
+    }
+
+    public static final Parcelable.Creator<WallPostModel> CREATOR = new Parcelable.Creator<WallPostModel>() {
+        public WallPostModel createFromParcel(Parcel in) {
+            return new WallPostModel(in);
+        }
+
+        public WallPostModel[] newArray(int size) {
+            return new WallPostModel[size];
+        }
+    };
 }

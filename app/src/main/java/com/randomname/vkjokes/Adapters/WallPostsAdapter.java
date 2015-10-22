@@ -115,7 +115,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         holder.commentCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callbacks.onCommentsClick();
+                callbacks.onCommentsClick(wallPost);
             }
         });
 
@@ -127,45 +127,49 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             holder.likeButton.setImageResource(R.drawable.empty_like);
         }
 
-        holder.likeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VKParameters params = new VKParameters();
-                params.put("type", "post");
-                params.put("owner_id", wallPost.getFromId());
-                params.put("item_id", wallPost.getId());
+        if (VKSdk.isLoggedIn()) {
+            holder.likeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    VKParameters params = new VKParameters();
+                    params.put("type", "post");
+                    params.put("owner_id", wallPost.getFromId());
+                    params.put("item_id", wallPost.getId());
 
-                String requestType;
-                if (wallPost.getAlreadyLiked()) {
-                    requestType = "likes.delete";
-                    wallPost.setLikeCount(wallPost.getLikeCount() - 1);
-                    wallPost.setAlreadyLiked(false);
-                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
-                    holder.likeButton.setImageResource(R.drawable.empty_like);
-                } else {
-                    requestType = "likes.add";
-                    wallPost.setLikeCount(wallPost.getLikeCount() + 1);
-                    wallPost.setAlreadyLiked(true);
-                    holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
-                    holder.likeButton.setImageResource(R.drawable.active_like);
+                    String requestType;
+                    if (wallPost.getAlreadyLiked()) {
+                        requestType = "likes.delete";
+                        wallPost.setLikeCount(wallPost.getLikeCount() - 1);
+                        wallPost.setAlreadyLiked(false);
+                        holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                        holder.likeButton.setImageResource(R.drawable.empty_like);
+                    } else {
+                        requestType = "likes.add";
+                        wallPost.setLikeCount(wallPost.getLikeCount() + 1);
+                        wallPost.setAlreadyLiked(true);
+                        holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+                        holder.likeButton.setImageResource(R.drawable.active_like);
+                    }
+
+                    final VKRequest request = new VKRequest(requestType, params);
+                    request.executeWithListener(new VKRequest.VKRequestListener() {
+                        @Override
+                        public void onComplete(VKResponse response) {
+                            super.onComplete(response);
+                            wallPostModelArrayList.set(i, wallPost);
+                        }
+
+                        @Override
+                        public void onError(VKError error) {
+                            super.onError(error);
+                            Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
-
-                final VKRequest request = new VKRequest(requestType, params);
-                request.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        wallPostModelArrayList.set(i, wallPost);
-                    }
-
-                    @Override
-                    public void onError(VKError error) {
-                        super.onError(error);
-                        Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
+            });
+        } else {
+            Toast.makeText(mContext, "Zargsa", Toast.LENGTH_SHORT).show();
+        }
 
         switch (type) {
             case MAIN_VIEW_HOLDER:

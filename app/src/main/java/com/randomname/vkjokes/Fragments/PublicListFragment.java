@@ -177,7 +177,7 @@ public class PublicListFragment extends Fragment {
             wallPostModel.setCommentsCount(vkApiPost.comments_count);
             wallPostModel.setLikeCount(vkApiPost.likes_count);
             wallPostModel.setAlreadyLiked(vkApiPost.user_likes);
-            wallPostModel.setCanLike(vkApiPost.can_like);
+            wallPostModel.setCanPost(vkApiPost.can_post_comment);
             wallPostModel.setFromId(vkApiPost.from_id);
 
             if (vkApiPost.date > 0) {
@@ -252,6 +252,6 @@ public class PublicListFragment extends Fragment {
 
     public interface PublicListFragmentCallback {
         public void onButtonClick(ArrayList<String> wallPhotos, int position);
-        public void onCommentsClick();
+        public void onCommentsClick(WallPostModel wallPostModel);
     }
 }

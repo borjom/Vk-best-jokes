@@ -22,6 +22,7 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.randomname.vkjokes.Models.WallPostModel;
 import com.vk.sdk.VKSdk;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
 
     private final static String FULLSCREEN_FRAGMENT_TAG = "full_screen_tag";
     private final static String COMMENTS_FRAGMENT_TAG = "comments_fragment_tag";
-    private final static String MENU_STATUS_STATE = "menu_status_state";
+    private final static String MENU_ICON_STATE = "menu_icon_state";
     private final static String TOOLBAR_COLOR_STATE = "toolbar_color_state";
     private final static String STATUS_COLOR_STATE = "window_color_state";
     private final static String TOOLBAR_TITLE_STATE = "toolbar_title_state";
@@ -63,10 +64,10 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         }
 
         if (savedInstanceState != null) {
-            materialMenu.setTransformationOffset(
-                    MaterialMenuDrawable.AnimationState.BURGER_ARROW,
-                    savedInstanceState.getFloat(MENU_STATUS_STATE)
-            );
+
+            String stringIconState = savedInstanceState.getString(MENU_ICON_STATE);
+
+            materialMenu.setIconState(MaterialMenuDrawable.IconState.valueOf(stringIconState));
 
             toolbar.setBackgroundColor(savedInstanceState.getInt(TOOLBAR_COLOR_STATE, Color.parseColor("#2196F3")));
             getSupportActionBar().setTitle(savedInstanceState.getCharSequence(TOOLBAR_TITLE_STATE));
@@ -83,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putFloat(MENU_STATUS_STATE, materialMenu.getTransformationValue());
+        MaterialMenuDrawable.IconState iconState = materialMenu.getIconState();
+        outState.putString(MENU_ICON_STATE, iconState.name());
 
         int color = Color.TRANSPARENT;
         Drawable background = toolbar.getBackground();
@@ -274,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     }
 
     @Override
-    public void onCommentsClick() {
+    public void onCommentsClick(WallPostModel wallPostModel) {
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentByTag(COMMENTS_FRAGMENT_TAG);
         if (fragment == null) {
@@ -282,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.stay_still);
 
             Bundle data = new Bundle();
+            data.putParcelable(CommentsFragment.WALL_POST_MODEL_KEY, wallPostModel);
 
             fragment = CommentsFragment.getInstance(data);
             ft.add(R.id.main_frame, fragment, COMMENTS_FRAGMENT_TAG);
