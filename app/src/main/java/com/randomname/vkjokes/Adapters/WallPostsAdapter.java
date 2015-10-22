@@ -112,6 +112,13 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         holder.commentCountTextView.setText(commentCount);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
 
+        holder.commentCountTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callbacks.onCommentsClick();
+            }
+        });
+
         if (!VKSdk.isLoggedIn()) {
             holder.likeButton.setImageResource(R.drawable.disabled_like);
         } else if (wallPost.getAlreadyLiked()) {
@@ -234,6 +241,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             customViewHolder.smallImage2.setVisibility(View.GONE);
             customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
+            customViewHolder.alphaView.setVisibility(View.GONE);
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
@@ -261,6 +269,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
                         if (wallPhotos.size() > 4) {
                             customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                            customViewHolder.alphaView.setVisibility(View.VISIBLE);
                         }
                         break;
                     default:
@@ -278,6 +287,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             customViewHolder.smallImage2.setVisibility(View.GONE);
             customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
+            customViewHolder.alphaView.setVisibility(View.GONE);
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage1.setImageResource(android.R.color.transparent);
             customViewHolder.smallImage2.setImageResource(android.R.color.transparent);
@@ -305,6 +315,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
                         if (wallPhotos.size() > 4) {
                             customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
+                            customViewHolder.alphaView.setVisibility(View.VISIBLE);
                         }
                         break;
                     default:
@@ -357,6 +368,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         protected TextView textView, morePhoto;
         protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
         protected RelativeLayout smallImage3Wrapper;
+        protected View alphaView;
 
         public MainViewHolderMultipleImages(View view) {
             super(view);
@@ -367,6 +379,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
             this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
+            this.alphaView = (View) view.findViewById(R.id.alpha_view);
         }
     }
 
@@ -374,6 +387,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         protected TextView morePhoto;
         protected ImageView mainImage, smallImage1, smallImage2, smallImage3;
         protected RelativeLayout smallImage3Wrapper;
+        protected View alphaView;
 
         public NoTextMainHolderMultipleImages(View view) {
             super(view);
@@ -383,6 +397,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.smallImage2 = (ImageView) view.findViewById(R.id.small_image_2);
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
             this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
+            this.alphaView = (View) view.findViewById(R.id.alpha_view);
         }
     }
 }

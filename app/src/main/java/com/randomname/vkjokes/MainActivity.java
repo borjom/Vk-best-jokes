@@ -15,13 +15,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
+import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
+import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.vk.sdk.VKSdk;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,6 +33,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements PublicListFragment.PublicListFragmentCallback {
 
     private final static String FULLSCREEN_FRAGMENT_TAG = "full_screen_tag";
+    private final static String COMMENTS_FRAGMENT_TAG = "comments_fragment_tag";
     private final static String MENU_STATUS_STATE = "menu_status_state";
     private final static String TOOLBAR_COLOR_STATE = "toolbar_color_state";
     private final static String STATUS_COLOR_STATE = "window_color_state";
@@ -118,7 +123,29 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     }
 
     private void closeFullscreen(boolean toClose) {
-        Fragment frag = getSupportFragmentManager().findFragmentByTag(FULLSCREEN_FRAGMENT_TAG);
+
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+
+        Fragment frag = fragments.get(fragments.size() - 1);
+
+        if (frag == null) {
+            return;
+        }
+
+        String tag = frag.getTag();
+
+        switch (tag) {
+            case FULLSCREEN_FRAGMENT_TAG:
+                closePhotoFragment(toClose, frag);
+                break;
+            case COMMENTS_FRAGMENT_TAG:
+                closeCommentFragment(toClose, frag);
+                break;
+            default:
+        }
+    }
+
+    private void closePhotoFragment(boolean toClose, Fragment frag) {
         if (frag != null) {
             animateToolbar(
                     Color.parseColor("#000000"),
@@ -140,6 +167,23 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             }
 
             getSupportActionBar().setTitle(R.string.app_name);
+        }
+    }
+
+    private void closeCommentFragment(boolean toClose, Fragment frag) {
+        if (frag != null) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.stay_still, R.anim.slide_out_top);
+            ft.hide(frag);
+            ft.commit();
+
+            if (toClose) {
+                getSupportFragmentManager().popBackStack();
+            }
+
+            getSupportActionBar().setTitle(R.string.app_name);
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER, false);
         }
     }
 
@@ -229,4 +273,23 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         openFullScreenFragment(wallPhotos, position);
     }
 
+    @Override
+    public void onCommentsClick() {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentByTag(COMMENTS_FRAGMENT_TAG);
+        if (fragment == null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.stay_still);
+
+            Bundle data = new Bundle();
+
+            fragment = CommentsFragment.getInstance(data);
+            ft.add(R.id.main_frame, fragment, COMMENTS_FRAGMENT_TAG);
+            ft.addToBackStack(COMMENTS_FRAGMENT_TAG);
+            ft.commit();
+            getSupportFragmentManager().executePendingTransactions();
+
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.CHECK, false);
+        }
+    }
 }

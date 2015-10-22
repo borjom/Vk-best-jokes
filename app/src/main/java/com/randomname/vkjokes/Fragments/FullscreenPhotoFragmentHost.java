@@ -11,9 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnPageChange;
+import butterknife.OnTouch;
 
 public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String PHOTOS_ARRAY_KEY = "photos_array_key";
@@ -44,6 +48,12 @@ public class FullscreenPhotoFragmentHost extends Fragment {
 
     @Bind(R.id.dummy_background_image)
     ImageView dummyBackground;
+
+    @Bind(R.id.slide_handler_view)
+    View slideHandlerView;
+
+    @Bind(R.id.main_layout)
+    RelativeLayout mainLayout;
 
     public FullscreenPhotoFragmentHost() {
     }

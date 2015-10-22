@@ -89,6 +89,7 @@
                         android:layout_height="match_parent"
                         android:background="#000000"
                         android:alpha="0.7"
+                        android:id="@+id/alpha_view"
                         />
 
                     <TextView

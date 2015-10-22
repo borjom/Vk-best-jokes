@@ -252,5 +252,6 @@ public class PublicListFragment extends Fragment {
 
     public interface PublicListFragmentCallback {
         public void onButtonClick(ArrayList<String> wallPhotos, int position);
+        public void onCommentsClick();
     }
 }
