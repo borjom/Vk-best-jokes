@@ -196,6 +196,7 @@ public class PublicListFragment extends Fragment {
 
     private void convertVKPostToWallPost(VKPostArray vkPosts) {
         int size = vkPosts.size();
+        int origSize = wallPostModelArrayList.size();
 
         for (int i = 0; i < size; i++) {
             VKApiPost vkApiPost = vkPosts.get(i);
@@ -243,6 +244,11 @@ public class PublicListFragment extends Fragment {
             wallPostModelArrayList.add(wallPostModel);
             adapter.notifyItemInserted(wallPostModelArrayList.size() - 1);
         }
+
+        if (wallPostModelArrayList.size() - origSize < 5) {
+            getWallPosts();
+        }
+
     }
 
     private boolean setWallModelAttachments(VKApiPost vkApiPost, WallPostModel wallPostModel) {

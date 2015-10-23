@@ -45,11 +45,10 @@
                 android:layout_marginTop="4dp"
                 android:orientation="horizontal">
 
-                <com.randomname.vkjokes.Views.ProportionalImageView
+                <ImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/small_image_1"
-                    android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:layout_weight="1" />
 
@@ -59,7 +58,6 @@
                     android:layout_marginRight="2dp"
                     android:layout_height="match_parent"
                     android:id="@+id/small_image_2"
-                    android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:layout_weight="1" />
 
@@ -73,7 +71,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/small_image_3"
-                        android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
                         />
 
@@ -81,8 +78,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="#000000"
-                        android:id="@+id/alpha_view"
                         android:alpha="0.7"
+                        android:id="@+id/alpha_view"
                         />
 
                     <TextView
@@ -102,8 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="4dp"
-                >
+                android:layout_marginTop="4dp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -115,7 +111,7 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="right"
                     android:layout_weight="1">
 
