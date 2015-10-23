@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -251,7 +252,6 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
         if (wallPhotos.size() > 0) {
-
             customViewHolder.smallImage2.setVisibility(View.GONE);
             customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
             customViewHolder.alphaView.setVisibility(View.GONE);
