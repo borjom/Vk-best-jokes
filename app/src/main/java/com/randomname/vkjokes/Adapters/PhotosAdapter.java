@@ -20,16 +20,22 @@ public class PhotosAdapter extends FragmentPagerAdapter {
     // Returns total number of pages
     @Override
     public int getCount() {
-        return wallPhotos.size();
+        return wallPhotos.size() + 1;
     }
 
     // Returns the fragment to display for that page
     @Override
     public Fragment getItem(int position) {
         Bundle data = new Bundle();
-        data.putString(FullscreenPhotoFragment.IMAGE_URL_KEY, wallPhotos.get(position));
+        Fragment fragment;
+        if (position == 0) {
+            fragment = new Fragment();
+        } else {
+            data.putString(FullscreenPhotoFragment.IMAGE_URL_KEY, wallPhotos.get(position - 1));
 
-        FullscreenPhotoFragment fragment = FullscreenPhotoFragment.getInstance(data);
+            fragment = FullscreenPhotoFragment.getInstance(data);
+        }
+
         return fragment;
     }
 

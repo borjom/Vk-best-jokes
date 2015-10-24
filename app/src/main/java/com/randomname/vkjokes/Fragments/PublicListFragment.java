@@ -51,6 +51,7 @@ public class PublicListFragment extends Fragment {
     final String WALL_POSTS_KEY = "wallPostsKey";
     final String RECYCLER_STATE_KEY = "recyclerStateKey";
     final String REQUEST_OFFSET_KEY = "requestOffsetKey";
+    final String CURRENT_PUBLIC_KEY = "currentPublic";
 
     private PublicListFragmentCallback publicListFragmentCallback;
     private WallPostsAdapter adapter;
@@ -59,6 +60,7 @@ public class PublicListFragment extends Fragment {
 
     private int offset = 0;
     private boolean loading = false;
+    private String currentPublic = "mdk";
 
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
@@ -125,6 +127,7 @@ public class PublicListFragment extends Fragment {
             Parcelable recyclerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
             preCachingLayoutManager.onRestoreInstanceState(recyclerState);
             offset = savedInstanceState.getInt(REQUEST_OFFSET_KEY);
+            currentPublic = savedInstanceState.getString(CURRENT_PUBLIC_KEY);
         }
 
         return view;
@@ -138,13 +141,14 @@ public class PublicListFragment extends Fragment {
         outState.putParcelable(RECYCLER_STATE_KEY, mListState);
 
         outState.putInt(REQUEST_OFFSET_KEY, offset);
+        outState.putString(CURRENT_PUBLIC_KEY, currentPublic);
 
         super.onSaveInstanceState(outState);
     }
 
     private void getWallPosts() {
         VKParameters params = new VKParameters();
-        params.put("domain", "mdk");
+        params.put("domain", currentPublic);
         params.put("count", "10");
         params.put("filter", "owner");
         params.put("offset", offset);
@@ -192,6 +196,15 @@ public class PublicListFragment extends Fragment {
                 Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void changePublic(String newPublic) {
+        int oldSize = wallPostModelArrayList.size();
+        wallPostModelArrayList.clear();
+        adapter.notifyItemRangeRemoved(0, oldSize);
+        offset = 0;
+        currentPublic = newPublic;
+        getWallPosts();
     }
 
     private void convertVKPostToWallPost(VKPostArray vkPosts) {
@@ -294,5 +307,7 @@ public class PublicListFragment extends Fragment {
         public void onButtonClick(ArrayList<String> wallPhotos, int position);
         public void onCommentsClick(WallPostModel wallPostModel);
         public void showVkAlert();
+        public void onPhotoFragmentPageSlide(float offset);
+        public void onPhotoPageClose();
     }
 }

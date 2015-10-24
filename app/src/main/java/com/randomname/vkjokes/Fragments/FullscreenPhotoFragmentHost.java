@@ -1,5 +1,7 @@
 package com.randomname.vkjokes.Fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -8,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +39,8 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String PHOTOS_ARRAY_KEY = "photos_array_key";
     public final static String POSITION_KEY = "position_key";
 
+    private PublicListFragment.PublicListFragmentCallback publicListFragmentCallback;
+
     private ArrayList<String> wallPhotos;
     private int position;
 
@@ -59,13 +64,29 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity a;
+
+        if (context instanceof Activity){
+            a = (Activity) context;
+
+            try {
+                publicListFragmentCallback = (PublicListFragment.PublicListFragmentCallback) a;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(a.toString() + " must implement MainFragmentCallbacks");
+            }
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         wallPhotos = getArguments().getStringArrayList(PHOTOS_ARRAY_KEY);
 
         if (savedInstanceState == null) {
-            position = getArguments().getInt(POSITION_KEY);
+            position = getArguments().getInt(POSITION_KEY) + 1;
         } else {
             position = savedInstanceState.getInt(POSITION_KEY);
         }
@@ -81,6 +102,33 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         adapter = new PhotosAdapter(getChildFragmentManager(), wallPhotos);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (position == 0) {
+                    try {
+                        publicListFragmentCallback.onPhotoFragmentPageSlide(positionOffset);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onPageSelected(int pos) {
+                if (pos == 0) {
+                    return;
+                }
+                position = pos;
+                setNewTitle();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         return view;
     }
@@ -115,17 +163,11 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         super.onDestroyView();
     }
 
-    @OnPageChange(R.id.viewPager)
-    public void onPageChanged() {
-        position = viewPager.getCurrentItem();
-        setNewTitle();
-    }
-
     private void setNewTitle() {
         if (wallPhotos.size() > 1) {
             try {
                 AppCompatActivity activity = (AppCompatActivity) getActivity();
-                activity.getSupportActionBar().setTitle((position + 1) + " из " + wallPhotos.size());
+                activity.getSupportActionBar().setTitle((position) + " из " + wallPhotos.size());
             } catch (Exception e) {
                 e.printStackTrace();
             }

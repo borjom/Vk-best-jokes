@@ -1,5 +1,6 @@
 package com.randomname.vkjokes;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.graphics.Color;
@@ -9,9 +10,11 @@ import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +22,11 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
@@ -40,11 +48,18 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     private final static String TOOLBAR_COLOR_STATE = "toolbar_color_state";
     private final static String STATUS_COLOR_STATE = "window_color_state";
     private final static String TOOLBAR_TITLE_STATE = "toolbar_title_state";
+    private final static String TOOLBAR_OLD_TITLE_STATE = "toolbar_old_title_state";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    private Drawer materialDrawer;
     private MaterialMenuDrawable materialMenu;
+    private PublicListFragment publicListFragment;
+    private String title;
+    private String oldTitle;
+
+    private float transitionOffset = 2.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,14 +69,12 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         initToolbar();
         FragmentManager fm = getSupportFragmentManager();
 
-        if (fm.getFragments() == null) {
-            Fragment fragment = fm.findFragmentByTag("PublicListFragment");
-            if (fragment == null) {
-                FragmentTransaction ft = fm.beginTransaction();
-                fragment = new PublicListFragment();
-                ft.replace(R.id.main_frame, fragment, "PublicListFragment");
-                ft.commit();
-            }
+        publicListFragment =(PublicListFragment) fm.findFragmentByTag("PublicListFragment");
+        if (publicListFragment == null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            publicListFragment = new PublicListFragment();
+            ft.replace(R.id.main_frame, publicListFragment, "PublicListFragment");
+            ft.commit();
         }
 
         if (savedInstanceState != null) {
@@ -71,7 +84,9 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
             materialMenu.setIconState(MaterialMenuDrawable.IconState.valueOf(stringIconState));
 
             toolbar.setBackgroundColor(savedInstanceState.getInt(TOOLBAR_COLOR_STATE, Color.parseColor("#2196F3")));
-            getSupportActionBar().setTitle(savedInstanceState.getCharSequence(TOOLBAR_TITLE_STATE));
+            title = savedInstanceState.getString(TOOLBAR_TITLE_STATE);
+            oldTitle = savedInstanceState.getString(TOOLBAR_OLD_TITLE_STATE);
+            setNewToolbarTitle(title);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(savedInstanceState.getInt(STATUS_COLOR_STATE, Color.parseColor("#1E88E5")));
@@ -81,54 +96,104 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        MaterialMenuDrawable.IconState iconState = materialMenu.getIconState();
-        outState.putString(MENU_ICON_STATE, iconState.name());
-
         int color = Color.TRANSPARENT;
-        Drawable background = toolbar.getBackground();
-        if (background instanceof ColorDrawable) {
-            color = ((ColorDrawable) background).getColor();
+        String iconStateString;
+
+        if (transitionOffset == 2.0f) {
+
+            MaterialMenuDrawable.IconState iconState = materialMenu.getIconState();
+            iconStateString = iconState.name();
+
+            Drawable background = toolbar.getBackground();
+            if (background instanceof ColorDrawable) {
+                color = ((ColorDrawable) background).getColor();
+            }
+        } else {
+            color = Color.argb(100, 0, 0, 0);
+            iconStateString = MaterialMenuDrawable.IconState.ARROW.name();
         }
 
         outState.putInt(TOOLBAR_COLOR_STATE, color);
+        outState.putString(MENU_ICON_STATE, iconStateString);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             outState.putInt(STATUS_COLOR_STATE, getWindow().getStatusBarColor());
         }
 
-        outState.putCharSequence(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle());
+        outState.putString(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle().toString());
+        outState.putString(TOOLBAR_OLD_TITLE_STATE, oldTitle);
 
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onBackPressed() {
-        closeFullscreen(false);
-        super.onBackPressed();
+        if(materialDrawer.isDrawerOpen()) {
+            materialDrawer.closeDrawer();
+        } else if(transitionOffset == 2.0f) {
+            closeFullscreen(false);
+            super.onBackPressed();
+        }
     }
 
     private void initToolbar() {
         setSupportActionBar(toolbar);
+        final String[] publicNames = getResources().getStringArray(R.array.public_name);
+        final String[] publicUrls = getResources().getStringArray(R.array.public_url);
+
+        materialDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        materialDrawer.closeDrawer();
+                        publicListFragment.changePublic(publicUrls[position]);
+                        title = publicNames[position];
+                        oldTitle = title;
+                        setNewToolbarTitle(title);
+                        return true;
+                    }
+                })
+                .build();
+
+        for (int i = 0; i < publicNames.length; i++) {
+            materialDrawer.addItem(new PrimaryDrawerItem().withName(publicNames[i]));
+        }
+
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeFullscreen(true);
+                if (transitionOffset != 2.0f) {
+                    return;
+                }
+
+                if (!closeFullscreen(true)) {
+                    materialDrawer.openDrawer();
+                }
             }
         });
 
         toolbar.setNavigationIcon(materialMenu);
+        title = publicNames[0];
+        oldTitle = title;
+        setNewToolbarTitle(title);
     }
 
-    private void closeFullscreen(boolean toClose) {
+    private void setNewToolbarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
 
+    private boolean closeFullscreen(boolean toClose) {
+        materialDrawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
 
         Fragment frag = fragments.get(fragments.size() - 1);
 
         if (frag == null) {
-            return;
+            return false;
         }
 
         String tag = frag.getTag();
@@ -136,18 +201,26 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         switch (tag) {
             case FULLSCREEN_FRAGMENT_TAG:
                 closePhotoFragment(toClose, frag);
-                break;
+                return true;
             case COMMENTS_FRAGMENT_TAG:
                 closeCommentFragment(toClose, frag);
-                break;
+                return true;
             default:
+                return false;
         }
     }
 
     private void closePhotoFragment(boolean toClose, Fragment frag) {
         if (frag != null) {
+
+            int color = Color.TRANSPARENT;
+            Drawable background = toolbar.getBackground();
+            if (background instanceof ColorDrawable) {
+                color = ((ColorDrawable) background).getColor();
+            }
+
             animateToolbar(
-                    Color.parseColor("#000000"),
+                    color,
                     Color.parseColor("#2196F3"),
                     MaterialMenuDrawable.AnimationState.BURGER_ARROW,
                     1
@@ -165,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                 getSupportFragmentManager().popBackStack();
             }
 
-            getSupportActionBar().setTitle(R.string.app_name);
+            setNewToolbarTitle(oldTitle);
         }
     }
 
@@ -181,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                 getSupportFragmentManager().popBackStack();
             }
 
-            getSupportActionBar().setTitle(R.string.app_name);
+            setNewToolbarTitle(oldTitle);
             materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER, false);
         }
     }
@@ -189,15 +262,42 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     private void animateToolbar(int colorFrom, int colorTo, final MaterialMenuDrawable.AnimationState state, final int offset) {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
 
-        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        colorAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
 
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                transitionOffset = 2.0f;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
                 toolbar.setBackgroundColor((Integer) animator.getAnimatedValue());
-                materialMenu.setTransformationOffset(
-                        state,
-                        animator.getAnimatedFraction() + offset
-                );
+                if (transitionOffset == 2.0f) {
+                    materialMenu.setTransformationOffset(
+                            state,
+                            animator.getAnimatedFraction() + offset
+                    );
+                } else if (animator.getAnimatedFraction() > (1 - transitionOffset)) {
+                    materialMenu.setTransformationOffset(
+                            state,
+                            1 - animator.getAnimatedFraction()
+                    );
+                }
 
                 int alphaValue = 255;
 
@@ -205,6 +305,12 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
                     alphaValue = Math.round(255 * (1.0f - animator.getAnimatedFraction()));
                 } else {
                     alphaValue = Math.round(255 * animator.getAnimatedFraction());
+                }
+
+                if (transitionOffset != 2.0f && animator.getAnimatedFraction() > (1 - transitionOffset)) {
+                    alphaValue = Math.round(255 * animator.getAnimatedFraction());
+                } else if (transitionOffset != 2.0f) {
+                    alphaValue = Math.round(255 * (1.0f - transitionOffset));
                 }
 
                 if (alphaValue > 100) {
@@ -270,6 +376,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     @Override
     public void onButtonClick(ArrayList<String> wallPhotos, int position) {
         openFullScreenFragment(wallPhotos, position);
+        materialDrawer.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     @Override
@@ -297,5 +404,51 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     public void showVkAlert() {
         VkLoginAlert alert = VkLoginAlert.newInstance();
         alert.show(getSupportFragmentManager(), "alertTag");
+    }
+
+    @Override
+    public void onPhotoFragmentPageSlide(float offset) {
+        transitionOffset = offset;
+
+        materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, offset);
+
+        toolbar.setBackgroundColor(interpolateColor(
+                android.R.color.black,
+                R.color.primary,
+                3 - (offset * 3)
+        ));
+
+        int alphaValue = Math.round(255 * (1.0f - offset));
+
+        if (alphaValue > 100) {
+            toolbar.getBackground().setAlpha(alphaValue);
+        } else {
+            toolbar.getBackground().setAlpha(100);
+        }
+
+        if (offset == 0.0f) {
+            getSupportFragmentManager().popBackStack();
+            transitionOffset = 2.0f;
+            setNewToolbarTitle(oldTitle);
+        }
+    }
+
+    private float interpolate(float a, float b, float proportion) {
+        return (a + ((b - a) * proportion));
+    }
+
+    private int interpolateColor(int a, int b, float proportion) {
+        float[] hsva = new float[3];
+        float[] hsvb = new float[3];
+        Color.colorToHSV(a, hsva);
+        Color.colorToHSV(b, hsvb);
+        for (int i = 0; i < 3; i++) {
+            hsvb[i] = interpolate(hsva[i], hsvb[i], proportion);
+        }
+        return Color.HSVToColor(hsvb);
+    }
+
+    @Override
+    public void onPhotoPageClose() {
     }
 }
