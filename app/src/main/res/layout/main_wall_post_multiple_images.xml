@@ -52,11 +52,10 @@
                 android:layout_marginTop="4dp"
                 android:orientation="horizontal">
 
-                <com.randomname.vkjokes.Views.ProportionalImageView
+                <ImageView
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="100dp"
                     android:id="@+id/small_image_1"
-                    android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:layout_weight="1" />
 
@@ -64,29 +63,27 @@
                     android:layout_width="0dp"
                     android:layout_marginLeft="2dp"
                     android:layout_marginRight="2dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="100dp"
                     android:id="@+id/small_image_2"
-                    android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:layout_weight="1" />
 
                 <RelativeLayout
                     android:id="@+id/small_image_3_layout"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="100dp"
                     android:layout_weight="1">
 
                     <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="100dp"
                         android:id="@+id/small_image_3"
-                        android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
                         />
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="100dp"
                         android:background="#000000"
                         android:alpha="0.7"
                         android:id="@+id/alpha_view"

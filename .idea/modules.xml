@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Vk-best-jokes.iml" filepath="$PROJECT_DIR$/Vk-best-jokes.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Vkjokes.iml" filepath="$PROJECT_DIR$/Vkjokes.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -32,10 +32,13 @@ import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.Models.WallPostModel;
+import com.randomname.vkjokes.Util.StringUtils;
 import com.vk.sdk.VKSdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
