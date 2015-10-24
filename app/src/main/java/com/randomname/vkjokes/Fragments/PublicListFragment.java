@@ -20,8 +20,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.randomname.vkjokes.Adapters.WallPostsAdapter;
+import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -53,7 +55,7 @@ public class PublicListFragment extends Fragment {
     final String REQUEST_OFFSET_KEY = "requestOffsetKey";
     final String CURRENT_PUBLIC_KEY = "currentPublic";
 
-    private PublicListFragmentCallback publicListFragmentCallback;
+    private FragmentsCallbacks publicListFragmentCallback;
     private WallPostsAdapter adapter;
     private ArrayList<WallPostModel> wallPostModelArrayList;
     private PreCachingLayoutManager preCachingLayoutManager;
@@ -78,7 +80,7 @@ public class PublicListFragment extends Fragment {
             a = (Activity) context;
 
             try {
-                publicListFragmentCallback = (PublicListFragmentCallback) a;
+                publicListFragmentCallback = (FragmentsCallbacks) a;
             } catch (ClassCastException e) {
                 throw new ClassCastException(a.toString() + " must implement MainFragmentCallbacks");
             }
@@ -221,7 +223,12 @@ public class PublicListFragment extends Fragment {
                 continue;
             }
 
-            wallPostModel.setText(vkApiPost.text);
+            String endText = vkApiPost.text;
+            endText = endText.replace(" ", "&nbsp;");
+            endText = StringUtils.replaceURLwithAnchor(endText);
+            endText = StringUtils.replaceVkLinks(endText);
+
+            wallPostModel.setText(endText);
             wallPostModel.setId(vkApiPost.getId());
             wallPostModel.setCommentsCount(vkApiPost.comments_count);
             wallPostModel.setLikeCount(vkApiPost.likes_count);
@@ -307,13 +314,5 @@ public class PublicListFragment extends Fragment {
         }
 
         return url;
-    }
-
-    public interface PublicListFragmentCallback {
-        public void onButtonClick(ArrayList<String> wallPhotos, int position);
-        public void onCommentsClick(WallPostModel wallPostModel);
-        public void showVkAlert();
-        public void onPhotoFragmentPageSlide(float offset);
-        public void onPhotoPageClose();
     }
 }

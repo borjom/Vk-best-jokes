@@ -5,6 +5,8 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
+import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
 public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<WallPostModel> wallPostModelArrayList;
     private Context mContext;
-    private PublicListFragment.PublicListFragmentCallback callbacks;
+    private FragmentsCallbacks callbacks;
 
     public final static int MAIN_VIEW_HOLDER = 0;
     public final static int NO_TEXT_MAIN_VIEW_HOLDER = 1;
@@ -57,7 +60,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             Activity a = (Activity) context;
 
             try {
-                callbacks = (PublicListFragment.PublicListFragmentCallback) a;
+                callbacks = (FragmentsCallbacks) a;
             } catch (ClassCastException e) {
                 e.printStackTrace();
             }
@@ -225,7 +228,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void fillMainViewHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolder customViewHolder = (MainViewHolder) viewHolder;
 
-        customViewHolder.textView.setText(wallPost.getText());
+        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
 
         final ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
@@ -241,13 +244,13 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void fillNoPhotoMainHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         NoPhotoMainHolder customViewHolder = (NoPhotoMainHolder) viewHolder;
 
-        customViewHolder.textView.setText(wallPost.getText());
+        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
     }
 
     private void fillMainViewHolderMultiple(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolderMultipleImages customViewHolder = (MainViewHolderMultipleImages) viewHolder;
 
-        customViewHolder.textView.setText(wallPost.getText());
+        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
 
         ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
@@ -356,6 +359,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             super(view);
             this.textView = (TextView) view.findViewById(R.id.textView);
             this.mainImage = (ImageView) view.findViewById(R.id.main_image);
+
+            textView.setMovementMethod (LinkMovementMethod.getInstance());
         }
     }
 
@@ -365,6 +370,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public NoPhotoMainHolder(View view) {
             super(view);
             this.textView = (TextView) view.findViewById(R.id.textView);
+
+            textView.setMovementMethod (LinkMovementMethod.getInstance());
         }
     }
 
@@ -393,6 +400,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
             this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
             this.alphaView = (View) view.findViewById(R.id.alpha_view);
+
+            textView.setMovementMethod (LinkMovementMethod.getInstance());
         }
     }
 

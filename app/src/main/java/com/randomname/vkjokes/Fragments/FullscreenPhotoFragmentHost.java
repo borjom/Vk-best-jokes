@@ -24,6 +24,7 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.randomname.vkjokes.Adapters.PhotosAdapter;
+import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Views.TouchImageView;
 import com.squareup.picasso.Picasso;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnPageChange;
 import butterknife.OnTouch;
 
@@ -39,7 +41,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String PHOTOS_ARRAY_KEY = "photos_array_key";
     public final static String POSITION_KEY = "position_key";
 
-    private PublicListFragment.PublicListFragmentCallback publicListFragmentCallback;
+    private FragmentsCallbacks publicListFragmentCallback;
 
     private ArrayList<String> wallPhotos;
     private int position;
@@ -50,6 +52,9 @@ public class FullscreenPhotoFragmentHost extends Fragment {
 
     @Bind(R.id.viewPager)
     ViewPager viewPager;
+
+    @Bind(R.id.main_layout)
+    RelativeLayout mainLayout;
 
     @Bind(R.id.dummy_background_image)
     ImageView dummyBackground;
@@ -72,7 +77,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
             a = (Activity) context;
 
             try {
-                publicListFragmentCallback = (PublicListFragment.PublicListFragmentCallback) a;
+                publicListFragmentCallback = (FragmentsCallbacks) a;
             } catch (ClassCastException e) {
                 throw new ClassCastException(a.toString() + " must implement MainFragmentCallbacks");
             }
@@ -109,6 +114,13 @@ public class FullscreenPhotoFragmentHost extends Fragment {
                 if (position == 0) {
                     try {
                         publicListFragmentCallback.onPhotoFragmentPageSlide(positionOffset);
+                        mainLayout.setAlpha(positionOffset);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        publicListFragmentCallback.onPhotoPageStop();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

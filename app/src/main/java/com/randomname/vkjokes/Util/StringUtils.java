@@ -21,4 +21,14 @@ public class StringUtils {
 
         return output;
     }
+
+    public static String replaceURLwithAnchor(String input) {
+
+        String urlRegex = "((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?";
+        String replacement = "<a href='$0'>$0</a>";
+
+        String output = input.replaceAll(urlRegex, replacement);
+
+        return output;
+    }
 }

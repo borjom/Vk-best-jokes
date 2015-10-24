@@ -18,6 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -27,10 +30,13 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
+import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.Util.StringUtils;
 import com.vk.sdk.VKSdk;
@@ -43,7 +49,7 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements PublicListFragment.PublicListFragmentCallback {
+public class MainActivity extends AppCompatActivity implements FragmentsCallbacks {
 
     private final static String FULLSCREEN_FRAGMENT_TAG = "full_screen_tag";
     private final static String COMMENTS_FRAGMENT_TAG = "comments_fragment_tag";
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     private final static String STATUS_COLOR_STATE = "window_color_state";
     private final static String TOOLBAR_TITLE_STATE = "toolbar_title_state";
     private final static String TOOLBAR_OLD_TITLE_STATE = "toolbar_old_title_state";
+    private final static String TOOLBAR_IS_SHOWN = "toolbar_is_shown";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -61,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     private PublicListFragment publicListFragment;
     private String title;
     private String oldTitle;
+    private boolean toolbarShown = true;
 
     private float transitionOffset = 2.0f;
 
@@ -83,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         if (savedInstanceState != null) {
 
             String stringIconState = savedInstanceState.getString(MENU_ICON_STATE);
-
             materialMenu.setIconState(MaterialMenuDrawable.IconState.valueOf(stringIconState));
 
             toolbar.setBackgroundColor(savedInstanceState.getInt(TOOLBAR_COLOR_STATE, Color.parseColor("#2196F3")));
@@ -93,6 +100,28 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(savedInstanceState.getInt(STATUS_COLOR_STATE, Color.parseColor("#1E88E5")));
+            }
+
+            toolbarShown = savedInstanceState.getBoolean(TOOLBAR_IS_SHOWN);
+
+            if (!toolbarShown) {
+                final ViewTreeObserver observer= toolbar.getViewTreeObserver();
+                observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        AnimatorSet set = new AnimatorSet();
+                        toolbarShown = false;
+                        set.playTogether(
+                                ObjectAnimator.ofFloat(toolbar, "translationY", -toolbar.getHeight())
+                        );
+                        set.setDuration(0).start();
+                        if (Build.VERSION.SDK_INT < 16) {
+                            toolbar.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        } else {
+                            toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+                    }
+                });
             }
         }
     }
@@ -125,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
 
         outState.putString(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle().toString());
         outState.putString(TOOLBAR_OLD_TITLE_STATE, oldTitle);
+        outState.putBoolean(TOOLBAR_IS_SHOWN, toolbarShown);
 
         super.onSaveInstanceState(outState);
     }
@@ -327,6 +357,15 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
         colorAnimation.setDuration(350);
         colorAnimation.setStartDelay(0);
         colorAnimation.start();
+
+        if (!toolbarShown) {
+            AnimatorSet set = new AnimatorSet();
+            toolbarShown = true;
+            set.playTogether(
+                    ObjectAnimator.ofFloat(toolbar, "translationY", 0)
+            );
+            set.setDuration(200).start();
+        }
     }
 
     private void animateStatusBar(int colorFrom, int colorTo) {
@@ -413,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     public void onPhotoFragmentPageSlide(float offset) {
         transitionOffset = offset;
 
-        materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, offset);
+        materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 1 + (1 - offset));
 
         toolbar.setBackgroundColor(interpolateColor(
                 android.R.color.black,
@@ -452,6 +491,26 @@ public class MainActivity extends AppCompatActivity implements PublicListFragmen
     }
 
     @Override
-    public void onPhotoPageClose() {
+    public void onPhotoPageStop() {
+        transitionOffset = 2.0f;
+    }
+
+    @Override
+    public void onPhotoClick() {
+        AnimatorSet set = new AnimatorSet();
+        if (toolbarShown) {
+            toolbarShown = false;
+            set.playTogether(
+                    ObjectAnimator.ofFloat(toolbar, "translationY", -toolbar.getBottom())
+            );
+            set.setDuration(350).start();
+
+        } else {
+            toolbarShown = true;
+            set.playTogether(
+                    ObjectAnimator.ofFloat(toolbar, "translationY", 0)
+            );
+            set.setDuration(350).start();
+        }
     }
 }
