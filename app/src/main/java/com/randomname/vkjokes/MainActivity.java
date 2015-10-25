@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     private float transitionOffset = 2.0f;
 
+    private static final int HIDE_THRESHOLD = 20;
+    private int scrolledDistance = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -357,15 +360,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         colorAnimation.setDuration(350);
         colorAnimation.setStartDelay(0);
         colorAnimation.start();
-
-        if (!toolbarShown) {
-            AnimatorSet set = new AnimatorSet();
-            toolbarShown = true;
-            set.playTogether(
-                    ObjectAnimator.ofFloat(toolbar, "translationY", 0)
-            );
-            set.setDuration(200).start();
-        }
     }
 
     private void animateStatusBar(int colorFrom, int colorTo) {
@@ -471,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         if (offset == 0.0f) {
             getSupportFragmentManager().popBackStack();
             transitionOffset = 2.0f;
+            toolbarShown = true;
             setNewToolbarTitle(oldTitle);
         }
     }
@@ -497,20 +492,46 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     @Override
     public void onPhotoClick() {
-        AnimatorSet set = new AnimatorSet();
         if (toolbarShown) {
             toolbarShown = false;
-            set.playTogether(
-                    ObjectAnimator.ofFloat(toolbar, "translationY", -toolbar.getBottom())
-            );
-            set.setDuration(350).start();
+            hideToolbar();
 
         } else {
             toolbarShown = true;
-            set.playTogether(
-                    ObjectAnimator.ofFloat(toolbar, "translationY", 0)
-            );
-            set.setDuration(350).start();
+            showToolbar();
+        }
+    }
+
+    private void hideToolbar() {
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(
+                ObjectAnimator.ofFloat(toolbar, "translationY", -toolbar.getBottom())
+        );
+        set.setDuration(350).start();
+    }
+
+    private void showToolbar() {
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(
+                ObjectAnimator.ofFloat(toolbar, "translationY", 0)
+        );
+        set.setDuration(350).start();
+    }
+
+    @Override
+    public void onPageScroll(int offset) {
+        if (scrolledDistance > HIDE_THRESHOLD && toolbarShown) {
+            hideToolbar();
+            toolbarShown = false;
+            scrolledDistance = 0;
+        } else if (scrolledDistance < -HIDE_THRESHOLD && !toolbarShown) {
+            showToolbar();
+            toolbarShown = true;
+            scrolledDistance = 0;
+        }
+
+        if((toolbarShown && offset > 0) || (!toolbarShown && offset < 0)) {
+            scrolledDistance += offset;
         }
     }
 }

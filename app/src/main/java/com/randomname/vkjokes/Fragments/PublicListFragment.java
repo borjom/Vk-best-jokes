@@ -103,7 +103,7 @@ public class PublicListFragment extends Fragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
+                publicListFragmentCallback.onPageScroll(dy);
                 int visibleItemCount = preCachingLayoutManager.getChildCount();
                 int totalItemCount = preCachingLayoutManager.getItemCount();
                 int pastVisiblesItems = preCachingLayoutManager.findFirstVisibleItemPosition();
@@ -118,7 +118,7 @@ public class PublicListFragment extends Fragment {
         });
 
         if (savedInstanceState == null) {
-            getWallPosts();
+            changePublic(currentPublic);
         } else {
             ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
 
@@ -267,6 +267,10 @@ public class PublicListFragment extends Fragment {
 
         if (wallPostModelArrayList.size() - origSize < 5) {
             getWallPosts();
+        }
+
+        if (origSize == 0) {
+            wallPostsRecyclerView.scrollToPosition(0);
         }
 
     }

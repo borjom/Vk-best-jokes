@@ -46,6 +46,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private Context mContext;
     private FragmentsCallbacks callbacks;
 
+    public final static int HEADER_VIEW_HOLDER = -1;
     public final static int MAIN_VIEW_HOLDER = 0;
     public final static int NO_TEXT_MAIN_VIEW_HOLDER = 1;
     public final static int MAIN_VIEW_HOLDER_MULTIPLE = 2;
@@ -69,7 +70,11 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        WallPostModel model = wallPostModelArrayList.get(position);
+        if (position == 0) {
+            return HEADER_VIEW_HOLDER;
+        }
+
+        WallPostModel model = wallPostModelArrayList.get(position - 1);
 
         return model.getType();
     }
@@ -80,6 +85,10 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         View view;
 
         switch (i) {
+            case HEADER_VIEW_HOLDER:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.public_recycler_header, null);
+                viewHolder = new HeaderViewHolder(view);
+                break;
             case MAIN_VIEW_HOLDER:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.main_wall_post, null);
                 viewHolder = new MainViewHolder(view);
@@ -110,7 +119,11 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
-        final WallPostModel wallPost = wallPostModelArrayList.get(i);
+        if (i == 0) {
+            return;
+        }
+
+        final WallPostModel wallPost = wallPostModelArrayList.get(i - 1);
 
         int type = wallPost.getType();
         int count = wallPost.getCommentsCount();
@@ -186,28 +199,32 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         switch (type) {
             case MAIN_VIEW_HOLDER:
-                fillMainViewHolder(wallPost, holder, i);
+                fillMainViewHolder(wallPost, holder, i - 1);
                 break;
             case NO_TEXT_MAIN_VIEW_HOLDER:
-                fillNoTextViewHolder(wallPost, holder, i);
+                fillNoTextViewHolder(wallPost, holder, i - 1);
                 break;
             case MAIN_VIEW_HOLDER_MULTIPLE:
-                fillMainViewHolderMultiple(wallPost, holder, i);
+                fillMainViewHolderMultiple(wallPost, holder, i - 1);
                 break;
             case NO_TEXT_MAIN_VIEW_MULTIPLE:
-                fillNoTextMainViewHolderMultiple(wallPost, holder, i);
+                fillNoTextMainViewHolderMultiple(wallPost, holder, i - 1);
                 break;
             case NO_PHOTO_MAIN_HOLDER:
-                fillNoPhotoMainHolder(wallPost, holder, i);
+                fillNoPhotoMainHolder(wallPost, holder, i - 1);
                 break;
             default:
-                fillMainViewHolder(wallPost, holder, i);
+                fillMainViewHolder(wallPost, holder, i - 1);
         }
+    }
+
+    public int getBasicItemCount() {
+        return (null != wallPostModelArrayList ? wallPostModelArrayList.size() : 0);
     }
 
     @Override
     public int getItemCount() {
-        return (null != wallPostModelArrayList ? wallPostModelArrayList.size() : 0);
+        return getBasicItemCount() + 1;
     }
 
     private void onImageClickAction(ArrayList<String> wallPhotos, int position) {
@@ -420,6 +437,13 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.smallImage3 = (ImageView) view.findViewById(R.id.small_image_3);
             this.smallImage3Wrapper = (RelativeLayout) view.findViewById(R.id.small_image_3_layout);
             this.alphaView = (View) view.findViewById(R.id.alpha_view);
+        }
+    }
+
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        public HeaderViewHolder(View itemView) {
+            super(itemView);
         }
     }
 
