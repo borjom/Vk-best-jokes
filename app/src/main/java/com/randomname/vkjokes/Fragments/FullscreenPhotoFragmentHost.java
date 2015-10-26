@@ -112,6 +112,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                viewPager.getParent().requestDisallowInterceptTouchEvent(true);
                 if (position == 0) {
                     try {
                         publicListFragmentCallback.onPhotoFragmentPageSlide(positionOffset);
@@ -140,6 +141,14 @@ public class FullscreenPhotoFragmentHost extends Fragment {
             @Override
             public void onPageScrollStateChanged(int state) {
 
+            }
+        });
+
+        viewPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
             }
         });
 
