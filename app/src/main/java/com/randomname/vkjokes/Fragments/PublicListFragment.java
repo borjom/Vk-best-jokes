@@ -27,6 +27,7 @@ import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Util.Constants;
+import com.randomname.vkjokes.Util.Misc;
 import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKApi;
@@ -46,6 +47,7 @@ import com.vk.sdk.api.model.VKPostArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import butterknife.Bind;
@@ -67,6 +69,8 @@ public class PublicListFragment extends Fragment {
     private int offset = 0;
     private boolean loading = false;
     private String currentPublic = "mdk";
+
+    VKRequest request;
 
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
@@ -108,7 +112,7 @@ public class PublicListFragment extends Fragment {
         TypedValue tv = new TypedValue();
         if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
-            refreshLayout.setProgressViewOffset(false, actionBarHeight / 2, actionBarHeight + 50);
+            refreshLayout.setProgressViewOffset(true, actionBarHeight / 2, actionBarHeight + 50);
         }
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -140,7 +144,7 @@ public class PublicListFragment extends Fragment {
         });
 
         if (savedInstanceState == null) {
-            changePublic(currentPublic);
+            getWallPosts();
         } else {
             ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
 
@@ -187,18 +191,22 @@ public class PublicListFragment extends Fragment {
         startDownloadingPosts(startOffset, toIncrement, appendFromBottom);
     }
 
-    private void startDownloadingPosts(int startOffset, final boolean toIncrement, final boolean appendFromBottom) {
+    private void startDownloadingPosts(final int startOffset, final boolean toIncrement, final boolean appendFromBottom) {
         if (loading) {
             return;
         }
         loading = true;
         VKParameters params = new VKParameters();
         params.put("domain", currentPublic);
-        params.put("count", "10");
+        params.put("count", "50");
         params.put("filter", "owner");
         params.put("offset", startOffset);
 
-        final VKRequest request = new VKRequest("wall.get", params);
+        if (request != null) {
+            request.cancel();
+        }
+
+        request = new VKRequest("wall.get", params);
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -211,11 +219,10 @@ public class PublicListFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 startConverting(posts, appendFromBottom);
 
                 if (toIncrement) {
-                    offset += 10;
+                    offset += posts.size();
                 }
                 loading = false;
             }
@@ -328,17 +335,15 @@ public class PublicListFragment extends Fragment {
             wallPostModelArrayList.addAll(1, newArray);
         }
 
+        Collections.sort(wallPostModelArrayList, new Misc.WallPostModelComparator());
+
         wallPostsRecyclerView.post(new Runnable() {
             @Override
             public void run() {
                 adapter.notifyDataSetChanged();
 
-                if (wallPostModelArrayList.size() - origSize < 5 && appendFromBottom) {
-                    getWallPosts();
-                }
-
                 if (origSize == 0) {
-                    wallPostsRecyclerView.scrollToPosition(0);
+                    //wallPostsRecyclerView.scrollToPosition(0);
                 }
 
                 if (refreshLayout.isRefreshing()) {

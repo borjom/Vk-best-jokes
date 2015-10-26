@@ -206,13 +206,19 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
                         title = publicNames[position];
                         oldTitle = title;
                         setNewToolbarTitle(title);
+                        if (!toolbarShown) {
+                            showToolbar();
+                        }
                         return true;
                     }
                 })
                 .build();
 
         for (int i = 0; i < publicNames.length; i++) {
-            materialDrawer.addItem(new PrimaryDrawerItem().withName(publicNames[i]));
+            materialDrawer.addItem(new PrimaryDrawerItem()
+                    .withName(publicNames[i])
+                    .withSelectable(false)
+            );
         }
 
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
@@ -536,16 +542,15 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     @Override
     public void onPhotoClick() {
         if (toolbarShown) {
-            toolbarShown = false;
             hideToolbar();
 
         } else {
-            toolbarShown = true;
             showToolbar();
         }
     }
 
     private void hideToolbar() {
+        toolbarShown = false;
         AnimatorSet set = new AnimatorSet();
         set.playTogether(
                 ObjectAnimator.ofFloat(toolbar, "translationY", -toolbar.getBottom())
@@ -554,6 +559,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     }
 
     private void showToolbar() {
+        toolbarShown = true;
         AnimatorSet set = new AnimatorSet();
         set.playTogether(
                 ObjectAnimator.ofFloat(toolbar, "translationY", 0)
