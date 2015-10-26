@@ -10,12 +10,20 @@ import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.mikepenz.materialdrawer.Drawer;
@@ -50,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+
+    @Bind(R.id.toolbar_title_switcher)
+    TextSwitcher toolbarTitleSwitcher;
 
     private Drawer materialDrawer;
     private MaterialMenuDrawable materialMenu;
@@ -147,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         outState.putInt(TOOLBAR_COLOR_STATE, color);
         outState.putString(MENU_ICON_STATE, iconStateString);
 
-        outState.putString(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle().toString());
+        outState.putString(TOOLBAR_TITLE_STATE, getToolbarTitle());
         outState.putString(TOOLBAR_OLD_TITLE_STATE, oldTitle);
         outState.putBoolean(TOOLBAR_IS_SHOWN, toolbarShown);
 
@@ -166,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     private void initToolbar() {
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initToolbarSwitcher();
         final String[] publicNames = getResources().getStringArray(R.array.public_name);
         final String[] publicUrls = getResources().getStringArray(R.array.public_url);
 
@@ -210,8 +223,35 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         setNewToolbarTitle(title);
     }
 
-    private void setNewToolbarTitle(String title) {
-        getSupportActionBar().setTitle(title);
+    private void initToolbarSwitcher() {
+        toolbarTitleSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+
+            public View makeView() {
+                // TODO Auto-generated method stub
+                // create new textView and set the properties like clolr, size etc
+                TextView myText = new TextView(MainActivity.this);
+                myText.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL | Gravity.LEFT);
+                myText.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.accent));
+                return myText;
+            }
+        });
+
+        Animation in = AnimationUtils.loadAnimation(this, R.anim.stay_still);
+        Animation out = AnimationUtils.loadAnimation(this,R.anim.stay_still);
+
+        toolbarTitleSwitcher.setInAnimation(in);
+        toolbarTitleSwitcher.setOutAnimation(out);
+    }
+
+    public void setNewToolbarTitle(String title) {
+        toolbarTitleSwitcher.setText(title);
+    }
+
+    private String getToolbarTitle() {
+        TextView currentlyShownTextView = (TextView) toolbarTitleSwitcher.getCurrentView();
+        String currentlyShownText = currentlyShownTextView.getText().toString();
+
+        return currentlyShownText;
     }
 
     private boolean closeFullscreen(boolean toClose) {

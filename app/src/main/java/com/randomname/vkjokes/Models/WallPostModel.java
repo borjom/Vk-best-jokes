@@ -37,6 +37,38 @@ public class WallPostModel implements Parcelable {
         fromId = in.readInt();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final WallPostModel other = (WallPostModel) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.id;
+        /*hash = 53 * hash + (this.text != null ? this.text.hashCode() : 0);
+        hash = 53 * hash + (this.postPhotos != null ? this.postPhotos.hashCode() : 0);
+        hash = 53 * hash + (this.date != null ? this.date.hashCode() : 0);
+        hash = 53 * hash + this.type;
+        hash = 53 * hash + this.id;
+        hash = 53 * hash + this.commentsCount;
+        hash = 53 * hash + this.likeCount;
+        hash = 53 * hash + this.fromId;
+        hash = 53 * hash + (alreadyLiked ? 1 : 0);
+        hash = 53 * hash + (canPost ? 1 : 0);*/
+        return hash;
+    }
+
     public String getText() {
         return text;
     }

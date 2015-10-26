@@ -15,5 +15,12 @@
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
         style="@style/Widget.MyApp.ActionBar"
-        />
+        >
+        <TextSwitcher
+            android:id="@+id/toolbar_title_switcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" />
+
+        </android.support.v7.widget.Toolbar>
 </RelativeLayout>

@@ -4,11 +4,18 @@
     android:background="@color/material_drawer_accent"
     android:layout_height="match_parent">
 
-    <view
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/wall_posts_recycler_view"
-        class="android.support.v7.widget.RecyclerView"
-        />
-
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        >
+        <view
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/wall_posts_recycler_view"
+            class="android.support.v7.widget.RecyclerView"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

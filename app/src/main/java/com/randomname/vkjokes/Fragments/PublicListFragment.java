@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +69,9 @@ public class PublicListFragment extends Fragment {
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
 
+    @Bind(R.id.refresh_layout)
+    SwipeRefreshLayout refreshLayout;
+
     public PublicListFragment() {
 
     }
@@ -93,6 +98,19 @@ public class PublicListFragment extends Fragment {
         ButterKnife.bind(this, view);
         wallPostModelArrayList = new ArrayList<>();
 
+        TypedValue tv = new TypedValue();
+        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+            refreshLayout.setProgressViewOffset(false, actionBarHeight / 2, actionBarHeight + 50);
+        }
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getWallPosts(0, false, false);
+            }
+        });
+
         preCachingLayoutManager = new PreCachingLayoutManager(getActivity());
 
         wallPostsRecyclerView.setLayoutManager(preCachingLayoutManager);
@@ -109,10 +127,7 @@ public class PublicListFragment extends Fragment {
                 int pastVisiblesItems = preCachingLayoutManager.findFirstVisibleItemPosition();
 
                 if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-                    if (!loading) {
-                        loading = true;
-                        getWallPosts();
-                    }
+                    getWallPosts();
                 }
             }
         });
@@ -149,11 +164,23 @@ public class PublicListFragment extends Fragment {
     }
 
     private void getWallPosts() {
+        startDownloadingPosts(offset, true, true);
+    }
+
+    private void getWallPosts(int startOffset, boolean toIncrement, boolean appendFromBottom) {
+        startDownloadingPosts(startOffset, toIncrement, appendFromBottom);
+    }
+
+    private void startDownloadingPosts(int startOffset, final boolean toIncrement, final boolean appendFromBottom) {
+        if (loading) {
+            return;
+        }
+        loading = true;
         VKParameters params = new VKParameters();
         params.put("domain", currentPublic);
         params.put("count", "10");
         params.put("filter", "owner");
-        params.put("offset", offset);
+        params.put("offset", startOffset);
 
         final VKRequest request = new VKRequest("wall.get", params);
         request.executeWithListener(new VKRequest.VKRequestListener() {
@@ -169,9 +196,11 @@ public class PublicListFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                convertVKPostToWallPost(posts);
+                startConverting(posts, appendFromBottom);
 
-                offset += 10;
+                if (toIncrement) {
+                    offset += 10;
+                }
                 loading = false;
             }
 
@@ -209,10 +238,21 @@ public class PublicListFragment extends Fragment {
         getWallPosts();
     }
 
-    private void convertVKPostToWallPost(VKPostArray vkPosts) {
-        int size = vkPosts.size();
-        int origSize = wallPostModelArrayList.size();
+    public void startConverting(final VKPostArray posts, final boolean appendFromBottom) {
+        // do something long
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                convertVKPostToWallPost(posts, appendFromBottom);
+            }
+        };
+        new Thread(runnable).start();
+    }
 
+    private void convertVKPostToWallPost(VKPostArray vkPosts, final boolean appendFromBottom) {
+        int size = vkPosts.size();
+        final int origSize = wallPostModelArrayList.size();
+        ArrayList<WallPostModel> newArray = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             VKApiPost vkApiPost = vkPosts.get(i);
             WallPostModel wallPostModel = new WallPostModel();
@@ -261,17 +301,35 @@ public class PublicListFragment extends Fragment {
                 wallPostModel.setType(WallPostsAdapter.MAIN_VIEW_HOLDER);
             }
 
-            wallPostModelArrayList.add(wallPostModel);
-            adapter.notifyItemInserted(wallPostModelArrayList.size() - 1);
+            if (!wallPostModelArrayList.contains(wallPostModel)) {
+                newArray.add(wallPostModel);
+            }
         }
 
-        if (wallPostModelArrayList.size() - origSize < 5) {
-            getWallPosts();
+        if (appendFromBottom) {
+            wallPostModelArrayList.addAll(newArray);
+        } else {
+            wallPostModelArrayList.addAll(1, newArray);
         }
 
-        if (origSize == 0) {
-            wallPostsRecyclerView.scrollToPosition(0);
-        }
+        wallPostsRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+
+                if (wallPostModelArrayList.size() - origSize < 5 && appendFromBottom) {
+                    getWallPosts();
+                }
+
+                if (origSize == 0) {
+                    wallPostsRecyclerView.scrollToPosition(0);
+                }
+
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.setRefreshing(false);
+                }
+            }
+        });
 
     }
 

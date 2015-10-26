@@ -25,6 +25,7 @@ import android.widget.Toolbar;
 
 import com.randomname.vkjokes.Adapters.PhotosAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
+import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Views.TouchImageView;
 import com.squareup.picasso.Picasso;
@@ -178,8 +179,8 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     private void setNewTitle() {
         if (wallPhotos.size() > 1) {
             try {
-                AppCompatActivity activity = (AppCompatActivity) getActivity();
-                activity.getSupportActionBar().setTitle((position) + " из " + wallPhotos.size());
+                MainActivity activity = (MainActivity) getActivity();
+                activity.setNewToolbarTitle(position + " из " + wallPhotos.size());
             } catch (Exception e) {
                 e.printStackTrace();
             }
