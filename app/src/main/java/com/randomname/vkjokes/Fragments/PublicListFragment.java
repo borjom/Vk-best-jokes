@@ -2,6 +2,7 @@ package com.randomname.vkjokes.Fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import com.randomname.vkjokes.Adapters.WallPostsAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Util.Constants;
 import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKApi;
@@ -98,6 +100,11 @@ public class PublicListFragment extends Fragment {
         ButterKnife.bind(this, view);
         wallPostModelArrayList = new ArrayList<>();
 
+        SharedPreferences prefs = getActivity().getSharedPreferences(
+                Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
+
+        currentPublic = prefs.getString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, "mdk");
+
         TypedValue tv = new TypedValue();
         if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
@@ -161,6 +168,15 @@ public class PublicListFragment extends Fragment {
         outState.putString(CURRENT_PUBLIC_KEY, currentPublic);
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences prefs = getActivity().getSharedPreferences(
+                Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
+
+        prefs.edit().putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, currentPublic).apply();
     }
 
     private void getWallPosts() {

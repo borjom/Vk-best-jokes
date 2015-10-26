@@ -3,6 +3,8 @@ package com.randomname.vkjokes;
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -38,6 +40,7 @@ import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
+import com.randomname.vkjokes.Util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +169,16 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences prefs = getSharedPreferences(
+                Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
+
+        prefs.edit().putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC_NAME, oldTitle).apply();
+    }
+
+    @Override
     public void onBackPressed() {
         if(materialDrawer.isDrawerOpen()) {
             materialDrawer.closeDrawer();
@@ -218,7 +231,11 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         });
 
         toolbar.setNavigationIcon(materialMenu);
-        title = publicNames[0];
+
+        SharedPreferences prefs = getSharedPreferences(
+                Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
+
+        title = prefs.getString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC_NAME, publicNames[0]);
         oldTitle = title;
         setNewToolbarTitle(title);
     }
