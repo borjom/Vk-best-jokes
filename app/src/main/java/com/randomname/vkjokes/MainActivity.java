@@ -14,21 +14,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -38,13 +30,9 @@ import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
-import com.randomname.vkjokes.Util.StringUtils;
-import com.vk.sdk.VKSdk;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -143,17 +131,21 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
             if (background instanceof ColorDrawable) {
                 color = ((ColorDrawable) background).getColor();
             }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                outState.putInt(STATUS_COLOR_STATE, getWindow().getStatusBarColor());
+            }
         } else {
             color = Color.argb(100, 0, 0, 0);
             iconStateString = MaterialMenuDrawable.IconState.ARROW.name();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                outState.putInt(STATUS_COLOR_STATE, Color.parseColor("#000000"));
+            }
         }
 
         outState.putInt(TOOLBAR_COLOR_STATE, color);
         outState.putString(MENU_ICON_STATE, iconStateString);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            outState.putInt(STATUS_COLOR_STATE, getWindow().getStatusBarColor());
-        }
 
         outState.putString(TOOLBAR_TITLE_STATE, getSupportActionBar().getTitle().toString());
         outState.putString(TOOLBAR_OLD_TITLE_STATE, oldTitle);
@@ -445,15 +437,24 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     @Override
     public void onPhotoFragmentPageSlide(float offset) {
         transitionOffset = offset;
+        ArgbEvaluator ev = new ArgbEvaluator();
+        int startColor = Color.parseColor("#000000");
+        int endColor;
+        int resultColor;
 
         materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 1 + (1 - offset));
 
-        toolbar.setBackgroundColor(interpolateColor(
-                android.R.color.black,
-                R.color.primary,
-                3 - (offset * 3)
-        ));
+        endColor = Color.parseColor("#2196F3");
+        resultColor = (Integer)ev.evaluate(1 - offset, startColor, endColor);
+        toolbar.setBackgroundColor(resultColor);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            endColor = Color.parseColor("#1E88E5");
+            resultColor = (Integer)ev.evaluate(1 - offset, startColor, endColor);
+
+            getWindow().setStatusBarColor(resultColor);
+
+        }
         int alphaValue = Math.round(255 * (1.0f - offset));
 
         if (alphaValue > 100) {
@@ -468,21 +469,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
             toolbarShown = true;
             setNewToolbarTitle(oldTitle);
         }
-    }
-
-    private float interpolate(float a, float b, float proportion) {
-        return (a + ((b - a) * proportion));
-    }
-
-    private int interpolateColor(int a, int b, float proportion) {
-        float[] hsva = new float[3];
-        float[] hsvb = new float[3];
-        Color.colorToHSV(a, hsva);
-        Color.colorToHSV(b, hsvb);
-        for (int i = 0; i < 3; i++) {
-            hsvb[i] = interpolate(hsva[i], hsvb[i], proportion);
-        }
-        return Color.HSVToColor(hsvb);
     }
 
     @Override
