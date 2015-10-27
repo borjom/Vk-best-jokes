@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -301,7 +303,7 @@ public class PublicListFragment extends Fragment {
 
             if (vkApiPost.date > 0) {
                 long millisecond = vkApiPost.date * 1000;
-                String dateString= DateFormat.format("dd MMMM kk:mm", new Date(millisecond)).toString();
+                String dateString = StringUtils.getDateString(millisecond);
 
                 wallPostModel.setDate(dateString);
             } else {

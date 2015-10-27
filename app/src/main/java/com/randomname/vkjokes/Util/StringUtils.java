@@ -1,7 +1,13 @@
 package com.randomname.vkjokes.Util;
 
+import android.app.Notification;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +34,18 @@ public class StringUtils {
         String replacement = "<a href='$0'>$0</a>";
 
         String output = input.replaceAll(urlRegex, replacement);
+
+        return output;
+    }
+
+    public static String getDateString(long milliseconds) {
+        String output = "";
+
+        if (DateUtils.isToday(milliseconds)) {
+            output = (String) DateUtils.getRelativeTimeSpanString(milliseconds);
+        } else {
+            output = DateFormat.format("dd MMMM kk:mm", new Date(milliseconds)).toString();
+        }
 
         return output;
     }

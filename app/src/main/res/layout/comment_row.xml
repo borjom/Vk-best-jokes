@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    >
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/avatar_image_view"
+        android:layout_alignParentLeft="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -9,6 +18,14 @@
         android:id="@+id/comment_text_view"
         android:textColorLink="@color/colorPrimary"
         android:clickable="true"
+        android:layout_toEndOf="@id/avatar_image_view"
         />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/date_text_view"
+        android:layout_alignParentRight="true"
+        />
+
+</RelativeLayout>

@@ -8,11 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Util.StringUtils;
+import com.randomname.vkjokes.Views.CircleTransform;
+import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.model.VKApiComment;
 import com.vk.sdk.api.model.VKApiUser;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -49,7 +52,10 @@ public class PhotoCommentsAdapter extends RecyclerView.Adapter<PhotoCommentsAdap
         commentText = StringUtils.replaceURLwithAnchor(commentText);
         commentText = StringUtils.replaceVkLinks(commentText);
 
+        String avatarUrl = user.photo_50;
+
         customViewHolder.commentText.setText(Html.fromHtml(commentText));
+        Picasso.with(mContext).load(avatarUrl).transform(new CircleTransform()).into(customViewHolder.userAvatar);
     }
 
     @Override
@@ -58,11 +64,14 @@ public class PhotoCommentsAdapter extends RecyclerView.Adapter<PhotoCommentsAdap
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        protected TextView commentText;
+        protected TextView commentText, dateTextView;
+        protected ImageView userAvatar;
 
         public CustomViewHolder(View view) {
             super(view);
             this.commentText = (TextView) view.findViewById(R.id.comment_text_view);
+            this.dateTextView = (TextView) view.findViewById(R.id.date_text_view);
+            this.userAvatar = (ImageView) view.findViewById(R.id.avatar_image_view);
 
             commentText.setMovementMethod (LinkMovementMethod.getInstance());
         }

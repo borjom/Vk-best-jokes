@@ -94,7 +94,7 @@ public class CommentsFragment extends Fragment {
         params.put("need_likes", 0);
         params.put("preview_length", 0);
         params.put("offset", 0);
-        params.put("count", "1");
+        params.put("count", "200");
         params.put("extended", "1");
 
         final VKRequest request = new VKRequest("wall.getComments", params);
@@ -158,17 +158,31 @@ public class CommentsFragment extends Fragment {
 
         for (int i = 0; i < size; i++) {
             VKApiComment comment = comments.get(i);
-            VKApiUserFull user = userFulls.get(i);
+            VKApiUserFull user = null;
             VKAttachments attachments = comment.attachments;
 
             if (attachments.size() > 0) {
                 continue;
             }
 
+            for(VKApiUserFull u : userFulls){
+                if (u.id == comment.from_id) {
+                    user = u;
+                    break;
+                }
+            }
+
+            if (user == null) {
+                user = new VKApiUserFull();
+            }
+
             hm = new HashMap<>();
             hm.put(USER_HASH_KEY, user);
             hm.put(COMMENT_HASH_KEY, comment);
-            output.add(hm);
+
+            if (!vkCommentsArray.contains(hm)) {
+                vkCommentsArray.add(hm);
+            }
         }
 
         return output;
