@@ -3,11 +3,37 @@
     <string-array name="public_url">
         <item>mdk</item>
         <item>onlyorly</item>
+        <item>fuck_humor</item>
+        <item>leprum</item>
+        <item>evil_incorparate</item>
+        <item>borsch</item>
+        <item>fucking_humor</item>
+        <item>fun_4_u</item>
+        <item>ilikes</item>
+        <item>iface</item>
+        <item>s_arcazm</item>
+        <item>fuck_hum</item>
+        <item>humour.page</item>
+        <item>in.humour</item>
+        <item>i.like.this</item>
     </string-array>
 
     <string-array name="public_name">
         <item>МДК</item>
         <item>Орлёнок</item>
+        <item>ЁП</item>
+        <item>Лепра</item>
+        <item>Корпорация Зла</item>
+        <item>БОРЩ</item>
+        <item>Убойный юмор</item>
+        <item>Смейся до слёз</item>
+        <item>Чёткие приколы</item>
+        <item>iFace</item>
+        <item>Сарказм</item>
+        <item>ПЗДЦ</item>
+        <item>Улетные приколы</item>
+        <item>Интеллектуальный юмор</item>
+        <item>Убейся Позитивом</item>
     </string-array>
 
 </resources>

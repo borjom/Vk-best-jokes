@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +89,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
         wallPhotos = getArguments().getStringArrayList(PHOTOS_ARRAY_KEY);
 
         if (savedInstanceState == null) {
@@ -153,6 +154,25 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fullscreen_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_save:
+                Toast.makeText(getActivity(), "Bla", Toast.LENGTH_SHORT).show();
+                return false;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     @Override

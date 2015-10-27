@@ -136,6 +136,8 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         holder.commentCountTextView.setText(commentCount);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
 
+        holder.commentCountTextView.setVisibility(View.GONE);
+
         holder.commentCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

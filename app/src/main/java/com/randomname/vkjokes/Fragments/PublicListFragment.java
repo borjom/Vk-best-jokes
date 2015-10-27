@@ -104,6 +104,10 @@ public class PublicListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
+
+        String[] publicUrls = getResources().getStringArray(R.array.public_url);
+        currentPublic = publicUrls[0];
+
         wallPostModelArrayList = new ArrayList<>();
 
         SharedPreferences prefs = getActivity().getSharedPreferences(
@@ -244,7 +248,7 @@ public class PublicListFragment extends Fragment {
             public void onError(VKError error) {
                 super.onError(error);
                 loading = false;
-
+                Log.e("mag", error.toString());
                 if (getActivity() == null) {
                     return;
                 }
