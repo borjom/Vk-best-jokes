@@ -250,8 +250,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         toolbarTitleSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
 
             public View makeView() {
-                // TODO Auto-generated method stub
-                // create new textView and set the properties like clolr, size etc
                 TextView myText = new TextView(MainActivity.this);
                 myText.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL | Gravity.LEFT);
                 myText.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.accent));
@@ -486,6 +484,10 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
             ft.addToBackStack(COMMENTS_FRAGMENT_TAG);
             ft.commit();
             getSupportFragmentManager().executePendingTransactions();
+
+            if (!toolbarShown) {
+                showToolbar();
+            }
 
             materialMenu.animateIconState(MaterialMenuDrawable.IconState.CHECK, false);
         }

@@ -1,6 +1,7 @@
 package com.randomname.vkjokes.Adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -54,8 +55,21 @@ public class PhotoCommentsAdapter extends RecyclerView.Adapter<PhotoCommentsAdap
 
         String avatarUrl = user.photo_50;
 
+        String userName = user.first_name + " " + user.last_name;
+
         customViewHolder.commentText.setText(Html.fromHtml(commentText));
-        Picasso.with(mContext).load(avatarUrl).transform(new CircleTransform()).into(customViewHolder.userAvatar);
+
+        try {
+            Picasso.with(mContext)
+                    .load(avatarUrl)
+                    .transform(new CircleTransform())
+                    .placeholder(R.drawable.camera_c)
+                    .into(customViewHolder.userAvatar);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        customViewHolder.userNameTextView.setText(userName);
 
         if (comment.date != 0) {
             customViewHolder.dateTextView.setText(StringUtils.getDateString(comment.date * 1000));
@@ -71,16 +85,23 @@ public class PhotoCommentsAdapter extends RecyclerView.Adapter<PhotoCommentsAdap
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        protected TextView commentText, dateTextView;
+        protected TextView commentText, dateTextView, userNameTextView;
         protected ImageView userAvatar;
 
         public CustomViewHolder(View view) {
             super(view);
             this.commentText = (TextView) view.findViewById(R.id.comment_text_view);
             this.dateTextView = (TextView) view.findViewById(R.id.date_text_view);
+            this.userNameTextView = (TextView) view.findViewById(R.id.user_name_text_view);
             this.userAvatar = (ImageView) view.findViewById(R.id.avatar_image_view);
 
             commentText.setMovementMethod (LinkMovementMethod.getInstance());
+
+            Typeface robotoLight = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Light.ttf");
+            Typeface robotoRegular = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Regular.ttf");
+            dateTextView.setTypeface(robotoLight);
+            commentText.setTypeface(robotoRegular);
+            userNameTextView.setTypeface(robotoRegular);
         }
     }
 }

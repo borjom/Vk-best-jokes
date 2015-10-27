@@ -1,6 +1,7 @@
 package com.randomname.vkjokes.Fragments;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -43,10 +44,15 @@ public class CommentsFragment extends Fragment {
     public final static String WALL_POST_MODEL_KEY = "wall_post_model_key";
     public final static String COMMENT_HASH_KEY = "wall_comment_hash_key";
     public final static String USER_HASH_KEY = "user_comment_hash_key";
+    public final static String COMMENTS_ARRAY_KEY = "comments_array_key";
+    public final static String OFFSET_KEY = "loading_offset_key";
+    public final static String RECYCLER_STATE_KEY = "resycler_state_key";
 
     private WallPostModel wallPostModel;
     private boolean loading = false;
     private ArrayList<HashMap<String, Object>> vkCommentsArray;
+
+    private int offset = 0;
 
     @Bind(R.id.comments_recycler_view)
     RecyclerView recyclerView;
@@ -83,8 +89,53 @@ public class CommentsFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
 
-        getComments();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleItemCount = preCachingLayoutManager.getChildCount();
+                int totalItemCount = preCachingLayoutManager.getItemCount();
+                int pastVisiblesItems = preCachingLayoutManager.findFirstVisibleItemPosition();
+
+                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount && offset >= 0) {
+                    getComments();
+                }
+            }
+        });
+
+        if (savedInstanceState != null) {
+            ArrayList<HashMap<String, Object>> restoredList =(ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable(COMMENTS_ARRAY_KEY);
+
+            if (restoredList != null) {
+                vkCommentsArray.addAll(restoredList);
+            }
+
+            Parcelable recyclerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
+            preCachingLayoutManager.onRestoreInstanceState(recyclerState);
+            offset = savedInstanceState.getInt(OFFSET_KEY);
+        } else {
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            getComments();
+                        }
+                    },
+                    300);
+        }
+
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(COMMENTS_ARRAY_KEY, vkCommentsArray);
+
+        Parcelable mListState = preCachingLayoutManager.onSaveInstanceState();
+        outState.putParcelable(RECYCLER_STATE_KEY, mListState);
+
+        outState.putInt(OFFSET_KEY, offset);
+
+        super.onSaveInstanceState(outState);
     }
 
     private void getComments() {
@@ -93,10 +144,10 @@ public class CommentsFragment extends Fragment {
         params.put("post_id", wallPostModel.getId());
         params.put("need_likes", 0);
         params.put("preview_length", 0);
-        params.put("offset", 0);
+        params.put("offset", offset);
         params.put("count", "200");
         params.put("extended", "1");
-        params.put("sort", "desc");
+        params.put("sort", "asc");
 
         final VKRequest request = new VKRequest("wall.getComments", params);
 
@@ -104,8 +155,8 @@ public class CommentsFragment extends Fragment {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                VKCommentArray comments = new VKCommentArray();
-                VKUsersArray userFulls = new VKUsersArray();
+                final VKCommentArray comments = new VKCommentArray();
+                final VKUsersArray userFulls = new VKUsersArray();
 
                 try {
                     JSONObject responseObject = response.json.getJSONObject("response");
@@ -114,16 +165,33 @@ public class CommentsFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                loading = false;
 
-                if (comments.size() == 200) {
-                    getComments();
+                offset += 200;
+
+                if (offset >= wallPostModel.getCommentsCount()) {
+                    offset = -1;
                 }
 
-                ArrayList<HashMap<String, Object>> newComments = fixComments(comments, userFulls);
+                final VKCommentArray finalComments = comments;
+                final VKUsersArray finalUserFulls = userFulls;
 
-                vkCommentsArray.addAll(newComments);
-                adapter.notifyDataSetChanged();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<HashMap<String, Object>> newComments = fixComments(finalComments, finalUserFulls);
+
+                        vkCommentsArray.addAll(newComments);
+
+                        recyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                                loading = false;
+                            }
+                        });
+                    }
+                };
+                new Thread(runnable).start();
             }
 
             @Override

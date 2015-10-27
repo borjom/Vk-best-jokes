@@ -260,11 +260,17 @@ public class PublicListFragment extends Fragment {
         adapter.notifyItemRangeRemoved(0, oldSize);
         offset = 0;
         currentPublic = newPublic;
-        getWallPosts();
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        getWallPosts();
+                    }
+                },
+                300);
     }
 
     public void startConverting(final VKPostArray posts, final boolean appendFromBottom) {
-        // do something long
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -334,7 +340,7 @@ public class PublicListFragment extends Fragment {
         if (appendFromBottom) {
             wallPostModelArrayList.addAll(newArray);
         } else {
-            wallPostModelArrayList.addAll(1, newArray);
+            wallPostModelArrayList.addAll(0, newArray);
         }
 
         Collections.sort(wallPostModelArrayList, new Misc.WallPostModelComparator());
