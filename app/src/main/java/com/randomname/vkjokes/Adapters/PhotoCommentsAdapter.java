@@ -56,6 +56,13 @@ public class PhotoCommentsAdapter extends RecyclerView.Adapter<PhotoCommentsAdap
 
         customViewHolder.commentText.setText(Html.fromHtml(commentText));
         Picasso.with(mContext).load(avatarUrl).transform(new CircleTransform()).into(customViewHolder.userAvatar);
+
+        if (comment.date != 0) {
+            customViewHolder.dateTextView.setText(StringUtils.getDateString(comment.date * 1000));
+        } else {
+            customViewHolder.dateTextView.setText("");
+        }
+
     }
 
     @Override

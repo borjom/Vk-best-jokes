@@ -96,6 +96,7 @@ public class CommentsFragment extends Fragment {
         params.put("offset", 0);
         params.put("count", "200");
         params.put("extended", "1");
+        params.put("sort", "desc");
 
         final VKRequest request = new VKRequest("wall.getComments", params);
 
