@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +13,27 @@ import android.widget.Toast;
 import com.randomname.vkjokes.Adapters.PhotoCommentsAdapter;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.PreCachingLayoutManager;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.methods.VKApiUsers;
 import com.vk.sdk.api.model.VKApiComment;
+import com.vk.sdk.api.model.VKApiUser;
+import com.vk.sdk.api.model.VKApiUserFull;
+import com.vk.sdk.api.model.VKAttachments;
 import com.vk.sdk.api.model.VKCommentArray;
 import com.vk.sdk.api.model.VKPostArray;
+import com.vk.sdk.api.model.VKUsersArray;
 
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,10 +41,12 @@ import butterknife.ButterKnife;
 public class CommentsFragment extends Fragment {
 
     public final static String WALL_POST_MODEL_KEY = "wall_post_model_key";
+    public final static String COMMENT_HASH_KEY = "wall_comment_hash_key";
+    public final static String USER_HASH_KEY = "user_comment_hash_key";
 
     private WallPostModel wallPostModel;
     private boolean loading = false;
-    private VKCommentArray vkCommentsArray;
+    private ArrayList<HashMap<String, Object>> vkCommentsArray;
 
     @Bind(R.id.comments_recycler_view)
     RecyclerView recyclerView;
@@ -60,7 +74,7 @@ public class CommentsFragment extends Fragment {
         View view = inflater.inflate(R.layout.comments_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        vkCommentsArray = new VKCommentArray();
+        vkCommentsArray = new ArrayList<>();
 
         preCachingLayoutManager = new PreCachingLayoutManager(getActivity());
         recyclerView.setLayoutManager(preCachingLayoutManager);
@@ -80,7 +94,8 @@ public class CommentsFragment extends Fragment {
         params.put("need_likes", 0);
         params.put("preview_length", 0);
         params.put("offset", 0);
-        params.put("count", "10");
+        params.put("count", "1");
+        params.put("extended", "1");
 
         final VKRequest request = new VKRequest("wall.getComments", params);
 
@@ -88,16 +103,25 @@ public class CommentsFragment extends Fragment {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-
                 VKCommentArray comments = new VKCommentArray();
+                VKUsersArray userFulls = new VKUsersArray();
 
                 try {
-                    comments.parse(response.json);
+                    JSONObject responseObject = response.json.getJSONObject("response");
+                    comments.fill(responseObject.getJSONArray("items"), VKApiComment.class);
+                    userFulls.fill(responseObject.getJSONArray("profiles"), VKApiUserFull.class);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 loading = false;
-                vkCommentsArray.addAll(comments);
+
+                if (comments.size() == 200) {
+                    getComments();
+                }
+
+                ArrayList<HashMap<String, Object>> newComments = fixComments(comments, userFulls);
+
+                vkCommentsArray.addAll(newComments);
                 adapter.notifyDataSetChanged();
             }
 
@@ -125,5 +149,28 @@ public class CommentsFragment extends Fragment {
                 Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private ArrayList<HashMap<String, Object>> fixComments(VKCommentArray comments,  VKUsersArray userFulls) {
+        int size = comments.size();
+        ArrayList<HashMap<String, Object>> output = new ArrayList<>();
+        HashMap<String, Object> hm;
+
+        for (int i = 0; i < size; i++) {
+            VKApiComment comment = comments.get(i);
+            VKApiUserFull user = userFulls.get(i);
+            VKAttachments attachments = comment.attachments;
+
+            if (attachments.size() > 0) {
+                continue;
+            }
+
+            hm = new HashMap<>();
+            hm.put(USER_HASH_KEY, user);
+            hm.put(COMMENT_HASH_KEY, comment);
+            output.add(hm);
+        }
+
+        return output;
     }
 }

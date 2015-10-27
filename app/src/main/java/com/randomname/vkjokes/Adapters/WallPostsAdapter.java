@@ -143,8 +143,6 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             }
         });
 
-        holder.commentCountTextView.setVisibility(View.INVISIBLE);
-
         if (wallPost.getAlreadyLiked()) {
             holder.likeButton.setImageResource(R.drawable.active_like);
         } else {
