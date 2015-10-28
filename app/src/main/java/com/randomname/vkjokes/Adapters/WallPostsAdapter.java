@@ -141,6 +141,35 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             holder.likeButton.setImageResource(R.drawable.empty_like);
         }
 
+        holder.repostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!VKSdk.isLoggedIn()) {
+                    callbacks.showVkAlert();
+                    return;
+                }
+
+                VKParameters params = new VKParameters();
+                String objectString = "wall" + wallPost.getFromId() + "_" + wallPost.getId();
+                params.put("object", objectString);
+
+                VKRequest request = new VKRequest("wall.repost", params);
+                request.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        super.onComplete(response);
+                        Toast.makeText(mContext, "Запись успешна сохранена", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(VKError error) {
+                        super.onError(error);
+                        Toast.makeText(mContext, error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
         holder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

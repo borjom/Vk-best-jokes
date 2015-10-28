@@ -143,7 +143,7 @@ public class PublicListFragment extends Fragment {
                 int totalItemCount = preCachingLayoutManager.getItemCount();
                 int pastVisiblesItems = preCachingLayoutManager.findFirstVisibleItemPosition();
 
-                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount / 2) {
                     getWallPosts();
                 }
             }
@@ -198,7 +198,7 @@ public class PublicListFragment extends Fragment {
     }
 
     private void startDownloadingPosts(final int startOffset, final boolean toIncrement, final boolean appendFromBottom) {
-        if (loading) {
+        if (loading || offset == -100) {
             return;
         }
         loading = true;
@@ -229,6 +229,10 @@ public class PublicListFragment extends Fragment {
 
                 if (toIncrement) {
                     offset += posts.size();
+                }
+
+                if (posts.size() == 0) {
+                    offset = -100;
                 }
                 loading = false;
             }
