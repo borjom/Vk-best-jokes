@@ -44,14 +44,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="4dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/comments_count_text_view"
-                    android:textColor="@color/colorPrimary"
-                    android:text="колво комментов"
-                    android:layout_weight="1" />
-
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="0dp"

@@ -47,21 +47,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:gravity="right"
                 android:layout_marginTop="4dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/comments_count_text_view"
-                    android:textColor="@color/colorPrimary"
-                    android:text="колво комментов"
-                    android:layout_weight="1" />
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:gravity="right"
-                    android:layout_weight="1">
 
                     <ImageButton
                         android:layout_width="20dp"
@@ -78,7 +65,16 @@
                         android:text="New Text"
                         android:id="@+id/likes_count_text_view"
                         android:layout_marginLeft="4dp" />
-                </LinearLayout>
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="8dp"
+                    android:id="@+id/repost_image_button"
+                    android:src="@drawable/like_button_states"
+                    android:adjustViewBounds="true"
+                    android:background="#00000000"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
         </LinearLayout>

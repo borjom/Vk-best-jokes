@@ -35,6 +35,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.randomname.vkjokes.Fragments.CommentsFragment;
+import com.randomname.vkjokes.Fragments.FullscreenPhotoFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;

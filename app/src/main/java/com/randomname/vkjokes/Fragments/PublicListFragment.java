@@ -299,7 +299,6 @@ public class PublicListFragment extends Fragment {
             }
 
             String endText = vkApiPost.text;
-            endText = endText.replace(" ", "&nbsp;");
             endText = StringUtils.replaceURLwithAnchor(endText);
             endText = StringUtils.replaceVkLinks(endText);
 
@@ -394,18 +393,18 @@ public class PublicListFragment extends Fragment {
         VKApiPhoto vkApiPhoto = (VKApiPhoto) attachment;
         String url = "";
 
-        url = vkApiPhoto.photo_2560;
-
-        if (url.isEmpty()) {
-            url = vkApiPhoto.photo_1280;
-        }
+        url = vkApiPhoto.photo_604;
 
         if (url.isEmpty()) {
             url = vkApiPhoto.photo_807;
         }
 
         if (url.isEmpty()) {
-            url = vkApiPhoto.photo_604;
+            url = vkApiPhoto.photo_1280;
+        }
+
+        if (url.isEmpty()) {
+            url = vkApiPhoto.photo_2560;
         }
 
         return url;

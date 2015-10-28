@@ -133,17 +133,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         final WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
         holder.dateTextView.setText(wallPost.getDate());
-        holder.commentCountTextView.setText(commentCount);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
-
-        holder.commentCountTextView.setVisibility(View.GONE);
-
-        holder.commentCountTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callbacks.onCommentsClick(wallPost);
-            }
-        });
 
         if (wallPost.getAlreadyLiked()) {
             holder.likeButton.setImageResource(R.drawable.active_like);
@@ -245,7 +235,11 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void fillMainViewHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolder customViewHolder = (MainViewHolder) viewHolder;
 
-        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        if (wallPost.getText().contains("href")) {
+            customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        } else {
+            customViewHolder.textView.setText(wallPost.getText());
+        }
 
         final ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
@@ -261,13 +255,21 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void fillNoPhotoMainHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         NoPhotoMainHolder customViewHolder = (NoPhotoMainHolder) viewHolder;
 
-        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        if (wallPost.getText().contains("href")) {
+            customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        } else {
+            customViewHolder.textView.setText(wallPost.getText());
+        }
     }
 
     private void fillMainViewHolderMultiple(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolderMultipleImages customViewHolder = (MainViewHolderMultipleImages) viewHolder;
 
-        customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        if (wallPost.getText().contains("href")) {
+            customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
+        } else {
+            customViewHolder.textView.setText(wallPost.getText());
+        }
 
         ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 

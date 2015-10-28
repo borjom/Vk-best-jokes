@@ -18,12 +18,16 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.view.ViewHelper;
 import com.randomname.vkjokes.Adapters.PhotosAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.MainActivity;
@@ -44,6 +48,9 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String POSITION_KEY = "position_key";
 
     private FragmentsCallbacks publicListFragmentCallback;
+
+    private MenuItem saveMenuItem;
+    private ImageView saveMenuItemActionView;
 
     private ArrayList<String> wallPhotos;
     private int position;
@@ -102,13 +109,15 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.full_screen_photo_fragment_host, container, false);
         ButterKnife.bind(this, view);
 
         adapter = new PhotosAdapter(getChildFragmentManager(), wallPhotos);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);
+
+        saveMenuItemActionView = (ImageView)inflater.inflate(R.layout.save_icon_action_view, null);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -118,10 +127,20 @@ public class FullscreenPhotoFragmentHost extends Fragment {
                     try {
                         publicListFragmentCallback.onPhotoFragmentPageSlide(positionOffset);
                         mainLayout.setAlpha(positionOffset);
+
+                        if (saveMenuItem.getActionView() == null) {
+                            saveMenuItem.setActionView(saveMenuItemActionView);
+                        }
+
+                        saveMenuItem.getActionView().setAlpha(positionOffset);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
+                    if (saveMenuItem.getActionView() != null) {
+                        getActivity().invalidateOptionsMenu();
+                    }
                     try {
                         publicListFragmentCallback.onPhotoPageStop();
                     } catch (Exception e) {
@@ -159,6 +178,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fullscreen_menu, menu);
+        saveMenuItem = menu.findItem(R.id.action_save);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
