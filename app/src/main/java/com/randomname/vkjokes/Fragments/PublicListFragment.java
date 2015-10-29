@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -72,13 +73,14 @@ public class PublicListFragment extends Fragment {
     private boolean loading = false;
     private String currentPublic = "mdk";
 
-    VKRequest request;
-
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
 
     @Bind(R.id.refresh_layout)
     SwipeRefreshLayout refreshLayout;
+
+    @Bind(R.id.progress_bar)
+    ProgressBar progressBar;
 
     public PublicListFragment() {
 
@@ -150,6 +152,7 @@ public class PublicListFragment extends Fragment {
         });
 
         if (savedInstanceState == null) {
+            progressBar.setVisibility(View.VISIBLE);
             getWallPosts();
         } else {
             ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
@@ -208,11 +211,7 @@ public class PublicListFragment extends Fragment {
         params.put("filter", "owner");
         params.put("offset", startOffset);
 
-        if (request != null) {
-            request.cancel();
-        }
-
-        request = new VKRequest("wall.get", params);
+        VKRequest request = new VKRequest("wall.get", params);
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -268,7 +267,7 @@ public class PublicListFragment extends Fragment {
         adapter.notifyItemRangeRemoved(0, oldSize);
         offset = 0;
         currentPublic = newPublic;
-
+        progressBar.setVisibility(View.VISIBLE);
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
@@ -355,6 +354,7 @@ public class PublicListFragment extends Fragment {
         wallPostsRecyclerView.post(new Runnable() {
             @Override
             public void run() {
+                progressBar.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
 
                 if (origSize == 0) {
