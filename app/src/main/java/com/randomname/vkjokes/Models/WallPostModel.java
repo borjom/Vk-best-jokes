@@ -1,12 +1,17 @@
 package com.randomname.vkjokes.Models;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.randomname.vkjokes.SQLite.VkJokesOpenHelper;
 import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKApiVideo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class WallPostModel implements Parcelable {
 
@@ -24,6 +29,19 @@ public class WallPostModel implements Parcelable {
     public WallPostModel() {
     }
 
+    public WallPostModel(Cursor c) {
+        text = c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_TEXT));
+        postPhotos = convertStringToArrayList(c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_POST_PHOTOS)));
+        type = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_TYPE));
+        id = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_POST_ID));
+        commentsCount = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_COMMENTS_COUNT));
+        likeCount = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_LIKE_COUNT));
+        date = c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_DATE));
+        alreadyLiked = intToBoolean(c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_ALREADY_LIKED)));
+        canPost = intToBoolean(c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_CAN_POST)));
+        fromId = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_FROM_ID));
+    }
+
     public WallPostModel(Parcel in) {
         text = in.readString();
         postPhotos = (ArrayList<String>) in.readSerializable();
@@ -35,6 +53,21 @@ public class WallPostModel implements Parcelable {
         alreadyLiked = in.readByte() != 0;
         canPost = in.readByte() != 0;
         fromId = in.readInt();
+    }
+
+    private ArrayList<String> convertStringToArrayList(String input){
+        String separator = "__,__";
+
+        String[] array = input.split(separator);
+        List<String> newList = Arrays.asList(array);
+        ArrayList<String> output = new ArrayList();
+        output.addAll(newList);
+
+        return output;
+    }
+
+    private boolean intToBoolean(int input) {
+        return input > 0;
     }
 
     @Override

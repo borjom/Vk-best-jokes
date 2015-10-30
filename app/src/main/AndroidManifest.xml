@@ -24,6 +24,10 @@
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
+        <provider
+            android:authorities="com.randomname.vkjokes.SQLite.VkJokesContentProvider"
+            android:name=".SQLite.VkJokesContentProvider" >
+        </provider>
     </application>
 
 </manifest>

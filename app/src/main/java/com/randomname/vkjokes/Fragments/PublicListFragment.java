@@ -3,6 +3,9 @@ package com.randomname.vkjokes.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
@@ -29,6 +32,8 @@ import com.randomname.vkjokes.Adapters.WallPostsAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
+import com.randomname.vkjokes.SQLite.VkJokesContentProvider;
+import com.randomname.vkjokes.SQLite.VkJokesOpenHelper;
 import com.randomname.vkjokes.Util.Constants;
 import com.randomname.vkjokes.Util.Misc;
 import com.randomname.vkjokes.Util.StringUtils;
@@ -47,7 +52,9 @@ import com.vk.sdk.api.model.VKCommentArray;
 import com.vk.sdk.api.model.VKList;
 import com.vk.sdk.api.model.VKPostArray;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -152,8 +159,7 @@ public class PublicListFragment extends Fragment {
         });
 
         if (savedInstanceState == null) {
-            progressBar.setVisibility(View.VISIBLE);
-            getWallPosts();
+            getWallPostsFromSQL();
         } else {
             ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
 
@@ -186,10 +192,86 @@ public class PublicListFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+
         SharedPreferences prefs = getActivity().getSharedPreferences(
                 Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
 
-        prefs.edit().putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, currentPublic).apply();
+        prefs.edit()
+                .putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, currentPublic)
+                .apply();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        VkJokesOpenHelper vkJokesOpenHelper = new VkJokesOpenHelper(getActivity());
+        SQLiteDatabase db = vkJokesOpenHelper.getWritableDatabase();
+
+        db.execSQL("delete from "+ VkJokesOpenHelper.TABLE_WALL_POSTS);
+
+        String sql = "INSERT INTO "+ VkJokesOpenHelper.TABLE_WALL_POSTS + "("
+                + VkJokesOpenHelper.COLUMN_TEXT + ","
+                + VkJokesOpenHelper.COLUMN_POST_PHOTOS + ","
+                + VkJokesOpenHelper.COLUMN_TYPE + ","
+                + VkJokesOpenHelper.COLUMN_POST_ID + ","
+                + VkJokesOpenHelper.COLUMN_COMMENTS_COUNT + ","
+                + VkJokesOpenHelper.COLUMN_LIKE_COUNT + ","
+                + VkJokesOpenHelper.COLUMN_DATE + ","
+                + VkJokesOpenHelper.COLUMN_ALREADY_LIKED + ","
+                + VkJokesOpenHelper.COLUMN_CAN_POST + ","
+                + VkJokesOpenHelper.COLUMN_FROM_ID + ") values(?,?,?,?,?,?,?,?,?,?)";
+        db.beginTransaction();
+
+        for(WallPostModel model : wallPostModelArrayList) {
+            SQLiteStatement stmt = db.compileStatement(sql);
+
+            stmt.bindString(1, model.getText());
+            stmt.bindString(2, convertArrayToString(model.getPostPhotos()));
+            stmt.bindLong(3, model.getType());
+            stmt.bindLong(4, model.getId());
+            stmt.bindLong(5, model.getCommentsCount());
+            stmt.bindLong(6, model.getLikeCount());
+            stmt.bindString(7, model.getDate());
+            stmt.bindLong(8, model.getAlreadyLiked() ? 1 : 0);
+            stmt.bindLong(9, model.getCanPost() ? 1 : 0);
+            stmt.bindLong(10, model.getFromId());
+
+            stmt.executeInsert();
+            stmt.clearBindings();
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private void getWallPostsFromSQL() {
+        Cursor c = getActivity().getContentResolver().query(VkJokesContentProvider.CONTENT_URI, null, null, null, null);
+
+        if (c.getCount() == 0) {
+            getWallPosts();
+            return;
+        }
+
+        c.moveToFirst();
+        while (c.moveToNext()) {
+            WallPostModel wallPostModel = new WallPostModel(c);
+            wallPostModelArrayList.add(wallPostModel);
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    private String convertArrayToString(ArrayList<String> input){
+        String str = "";
+        for (int i = 0; i < input.size(); i++) {
+            str = str + input.get(i);
+            // Do not append comma at the end of last element
+            if(i < input.size() - 1){
+                str = str + "__,__";
+            }
+        }
+        return str;
     }
 
     private void getWallPosts() {
