@@ -132,7 +132,16 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         String commentCount = count + " " + StringUtils.declarationOfNum(count, titles);
 
         final WallPostViewHolder holder = (WallPostViewHolder) viewHolder;
-        holder.dateTextView.setText(wallPost.getDate());
+        String dateString = "";
+
+        try {
+            long millisecond = Long.parseLong(wallPost.getDate());
+            dateString = StringUtils.getDateString(millisecond);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        holder.dateTextView.setText(dateString);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
 
         if (wallPost.getAlreadyLiked()) {

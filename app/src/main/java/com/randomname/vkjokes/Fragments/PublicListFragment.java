@@ -198,6 +198,7 @@ public class PublicListFragment extends Fragment {
 
         prefs.edit()
                 .putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, currentPublic)
+                .putInt(Constants.SHARED_PREFERENCES.WALL_POSTS_FIRST_ITEM, preCachingLayoutManager.findFirstVisibleItemPosition())
                 .apply();
 
     }
@@ -254,12 +255,17 @@ public class PublicListFragment extends Fragment {
         }
 
         c.moveToFirst();
-        while (c.moveToNext()) {
+        while (!c.isAfterLast()) {
             WallPostModel wallPostModel = new WallPostModel(c);
             wallPostModelArrayList.add(wallPostModel);
+            c.moveToNext();
         }
 
         adapter.notifyDataSetChanged();
+        SharedPreferences prefs = getActivity().getSharedPreferences(
+                Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
+        int itemPos = prefs.getInt(Constants.SHARED_PREFERENCES.WALL_POSTS_FIRST_ITEM, 0);
+        wallPostsRecyclerView.scrollToPosition(itemPos);
     }
 
     private String convertArrayToString(ArrayList<String> input){
@@ -338,6 +344,9 @@ public class PublicListFragment extends Fragment {
                     return;
                 }
 
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.setRefreshing(false);
+                }
                 Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
             }
         });
@@ -396,10 +405,7 @@ public class PublicListFragment extends Fragment {
             wallPostModel.setFromId(vkApiPost.from_id);
 
             if (vkApiPost.date > 0) {
-                long millisecond = vkApiPost.date * 1000;
-                String dateString = StringUtils.getDateString(millisecond);
-
-                wallPostModel.setDate(dateString);
+                wallPostModel.setDate((vkApiPost.date * 1000) + "");
             } else {
                 wallPostModel.setDate("");
             }
@@ -422,6 +428,9 @@ public class PublicListFragment extends Fragment {
 
             if (!wallPostModelArrayList.contains(wallPostModel)) {
                 newArray.add(wallPostModel);
+            } else {
+                int index = wallPostModelArrayList.indexOf(wallPostModel);
+                wallPostModelArrayList.set(index, wallPostModel);
             }
         }
 
