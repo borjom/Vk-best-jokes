@@ -4,5 +4,7 @@
         android:title="Сохранить"
         android:orderInCategory="100"
         android:icon="@drawable/ic_save_white_24dp"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        style="?android:attr/actionButtonStyle"
+        />
 </menu>

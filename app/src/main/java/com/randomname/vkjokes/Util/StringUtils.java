@@ -5,9 +5,12 @@ import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +49,29 @@ public class StringUtils {
         } else {
             output = DateFormat.format("dd MMMM kk:mm", new Date(milliseconds)).toString();
         }
+
+        return output;
+    }
+
+    public static String convertArrayToString(ArrayList<String> input){
+        String str = "";
+        for (int i = 0; i < input.size(); i++) {
+            str = str + input.get(i);
+            // Do not append comma at the end of last element
+            if(i < input.size() - 1){
+                str = str + "__,__";
+            }
+        }
+        return str;
+    }
+
+    public static ArrayList<String> convertStringToArrayList(String input){
+        String separator = "__,__";
+
+        String[] array = input.split(separator);
+        List<String> newList = Arrays.asList(array);
+        ArrayList<String> output = new ArrayList();
+        output.addAll(newList);
 
         return output;
     }

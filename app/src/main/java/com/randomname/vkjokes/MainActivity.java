@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         initToolbarSwitcher();
         final String[] publicNames = getResources().getStringArray(R.array.public_name);
         final String[] publicUrls = getResources().getStringArray(R.array.public_url);
+        final int[] publicIds = getResources().getIntArray(R.array.public_ids);
 
         materialDrawer = new DrawerBuilder()
                 .withActivity(this)
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         materialDrawer.closeDrawer();
-                        publicListFragment.changePublic(publicUrls[position]);
+                        publicListFragment.changePublic(publicUrls[position], publicIds[position]);
                         title = publicNames[position];
                         oldTitle = title;
                         setNewToolbarTitle(title);

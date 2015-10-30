@@ -18,6 +18,24 @@
         <item>i.like.this</item>
     </string-array>
 
+    <integer-array name="public_ids">
+        <item>-10639516</item>
+        <item>-36775802</item>
+        <item>-12382740</item>
+        <item>-30022666</item>
+        <item>-29246653</item>
+        <item>-460389</item>
+        <item>-30179569</item>
+        <item>-26419239</item>
+        <item>-23064236</item>
+        <item>-30277672</item>
+        <item>-36164349</item>
+        <item>-28261265</item>
+        <item>-22741624</item>
+        <item>-28950133</item>
+        <item>-24299135</item>
+    </integer-array>
+
     <string-array name="public_name">
         <item>МДК</item>
         <item>Орлёнок</item>

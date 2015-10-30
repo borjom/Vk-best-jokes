@@ -70,6 +70,7 @@ public class PublicListFragment extends Fragment {
     final String RECYCLER_STATE_KEY = "recyclerStateKey";
     final String REQUEST_OFFSET_KEY = "requestOffsetKey";
     final String CURRENT_PUBLIC_KEY = "currentPublic";
+    final String CURRENT_PUBLIC_ID_KEY = "currentPublicId";
 
     private FragmentsCallbacks publicListFragmentCallback;
     private WallPostsAdapter adapter;
@@ -79,6 +80,7 @@ public class PublicListFragment extends Fragment {
     private int offset = 0;
     private boolean loading = false;
     private String currentPublic = "mdk";
+    private int currentPublicId = 0;
 
     @Bind(R.id.wall_posts_recycler_view)
     RecyclerView wallPostsRecyclerView;
@@ -160,6 +162,8 @@ public class PublicListFragment extends Fragment {
 
         if (savedInstanceState == null) {
             getWallPostsFromSQL();
+            offset = prefs.getInt(Constants.SHARED_PREFERENCES.WALL_POSTS_OFFSET, 0);
+            currentPublicId = prefs.getInt(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC_ID, 0);
         } else {
             ArrayList<WallPostModel> restoredList = savedInstanceState.getParcelableArrayList(WALL_POSTS_KEY);
 
@@ -171,6 +175,7 @@ public class PublicListFragment extends Fragment {
             preCachingLayoutManager.onRestoreInstanceState(recyclerState);
             offset = savedInstanceState.getInt(REQUEST_OFFSET_KEY);
             currentPublic = savedInstanceState.getString(CURRENT_PUBLIC_KEY);
+            currentPublicId = savedInstanceState.getInt(CURRENT_PUBLIC_ID_KEY);
         }
 
         return view;
@@ -184,6 +189,7 @@ public class PublicListFragment extends Fragment {
         outState.putParcelable(RECYCLER_STATE_KEY, mListState);
 
         outState.putInt(REQUEST_OFFSET_KEY, offset);
+        outState.putInt(CURRENT_PUBLIC_ID_KEY, currentPublicId);
         outState.putString(CURRENT_PUBLIC_KEY, currentPublic);
 
         super.onSaveInstanceState(outState);
@@ -199,17 +205,18 @@ public class PublicListFragment extends Fragment {
         prefs.edit()
                 .putString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, currentPublic)
                 .putInt(Constants.SHARED_PREFERENCES.WALL_POSTS_FIRST_ITEM, preCachingLayoutManager.findFirstVisibleItemPosition())
+                .putInt(Constants.SHARED_PREFERENCES.WALL_POSTS_OFFSET, offset)
+                .putInt(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC_ID, currentPublicId)
                 .apply();
 
+        saveWallPostsToSQL();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void saveWallPostsToSQL() {
         VkJokesOpenHelper vkJokesOpenHelper = new VkJokesOpenHelper(getActivity());
         SQLiteDatabase db = vkJokesOpenHelper.getWritableDatabase();
 
-        db.execSQL("delete from "+ VkJokesOpenHelper.TABLE_WALL_POSTS);
+        db.execSQL("delete from " + VkJokesOpenHelper.TABLE_WALL_POSTS);
 
         String sql = "INSERT INTO "+ VkJokesOpenHelper.TABLE_WALL_POSTS + "("
                 + VkJokesOpenHelper.COLUMN_TEXT + ","
@@ -228,7 +235,7 @@ public class PublicListFragment extends Fragment {
             SQLiteStatement stmt = db.compileStatement(sql);
 
             stmt.bindString(1, model.getText());
-            stmt.bindString(2, convertArrayToString(model.getPostPhotos()));
+            stmt.bindString(2, StringUtils.convertArrayToString(model.getPostPhotos()));
             stmt.bindLong(3, model.getType());
             stmt.bindLong(4, model.getId());
             stmt.bindLong(5, model.getCommentsCount());
@@ -268,18 +275,6 @@ public class PublicListFragment extends Fragment {
         wallPostsRecyclerView.scrollToPosition(itemPos);
     }
 
-    private String convertArrayToString(ArrayList<String> input){
-        String str = "";
-        for (int i = 0; i < input.size(); i++) {
-            str = str + input.get(i);
-            // Do not append comma at the end of last element
-            if(i < input.size() - 1){
-                str = str + "__,__";
-            }
-        }
-        return str;
-    }
-
     private void getWallPosts() {
         startDownloadingPosts(offset, true, true);
     }
@@ -292,6 +287,7 @@ public class PublicListFragment extends Fragment {
         if (loading || offset == -100) {
             return;
         }
+
         loading = true;
         VKParameters params = new VKParameters();
         params.put("domain", currentPublic);
@@ -312,16 +308,23 @@ public class PublicListFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                startConverting(posts, appendFromBottom);
+
+                if (posts.size() == 0) {
+                    offset = -100;
+                } else {
+                    VKApiPost post = posts.get(0);
+                    int id = post.from_id;
+
+                    if (id != currentPublicId && currentPublicId != 0) {
+                        return;
+                    }
+                }
 
                 if (toIncrement) {
                     offset += posts.size();
                 }
 
-                if (posts.size() == 0) {
-                    offset = -100;
-                }
-                loading = false;
+                startConverting(posts, appendFromBottom);
             }
 
             @Override
@@ -352,7 +355,7 @@ public class PublicListFragment extends Fragment {
         });
     }
 
-    public void changePublic(String newPublic) {
+    public void changePublic(String newPublic, int publicId) {
         int oldSize = wallPostModelArrayList.size();
         wallPostModelArrayList.clear();
         adapter.notifyItemRangeRemoved(0, oldSize);
@@ -442,6 +445,7 @@ public class PublicListFragment extends Fragment {
 
         Collections.sort(wallPostModelArrayList, new Misc.WallPostModelComparator());
 
+        loading = false;
         wallPostsRecyclerView.post(new Runnable() {
             @Override
             public void run() {

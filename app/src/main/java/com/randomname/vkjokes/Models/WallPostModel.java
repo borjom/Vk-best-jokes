@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.randomname.vkjokes.SQLite.VkJokesOpenHelper;
+import com.randomname.vkjokes.Util.StringUtils;
 import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKApiVideo;
 
@@ -31,7 +32,7 @@ public class WallPostModel implements Parcelable {
 
     public WallPostModel(Cursor c) {
         text = c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_TEXT));
-        postPhotos = convertStringToArrayList(c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_POST_PHOTOS)));
+        postPhotos = StringUtils.convertStringToArrayList(c.getString(c.getColumnIndex(VkJokesOpenHelper.COLUMN_POST_PHOTOS)));
         type = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_TYPE));
         id = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_POST_ID));
         commentsCount = c.getInt(c.getColumnIndex(VkJokesOpenHelper.COLUMN_COMMENTS_COUNT));
@@ -53,17 +54,6 @@ public class WallPostModel implements Parcelable {
         alreadyLiked = in.readByte() != 0;
         canPost = in.readByte() != 0;
         fromId = in.readInt();
-    }
-
-    private ArrayList<String> convertStringToArrayList(String input){
-        String separator = "__,__";
-
-        String[] array = input.split(separator);
-        List<String> newList = Arrays.asList(array);
-        ArrayList<String> output = new ArrayList();
-        output.addAll(newList);
-
-        return output;
     }
 
     private boolean intToBoolean(int input) {

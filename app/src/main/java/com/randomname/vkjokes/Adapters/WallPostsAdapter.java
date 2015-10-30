@@ -2,8 +2,13 @@ package com.randomname.vkjokes.Adapters;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -19,6 +24,7 @@ import android.widget.Toast;
 
 import com.randomname.vkjokes.Fragments.PublicListFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
+import com.randomname.vkjokes.Fragments.WallPostChooser;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
@@ -270,6 +276,35 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         });
     }
 
+    private void setOnImageLongClick(View view, final String url) {
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String[] items = {"Скопировать адрес в буфер"};
+                AppCompatActivity a = (AppCompatActivity) mContext;
+                FragmentManager man = a.getSupportFragmentManager();
+
+                WallPostChooser chooser = WallPostChooser.newInstance(items);
+                chooser.setmClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("label", url);
+                                clipboard.setPrimaryClip(clip);
+                                break;
+                            default:
+                        }
+                    }
+                });
+                chooser.show(man, "bla");
+
+                return true;
+            }
+        });
+    }
+
     private void fillMainViewHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         MainViewHolder customViewHolder = (MainViewHolder) viewHolder;
 
@@ -280,18 +315,72 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         final ArrayList<String> wallPhotos = wallPost.getPostPhotos();
+        final String postText = wallPost.getText();
+
+        customViewHolder.textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String [] items = {"Скопировать в буфер"};
+                AppCompatActivity a = (AppCompatActivity) mContext;
+                FragmentManager man = a.getSupportFragmentManager();
+
+                WallPostChooser chooser = WallPostChooser.newInstance(items);
+                chooser.setmClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("label", postText);
+                                clipboard.setPrimaryClip(clip);
+                                break;
+                            default:
+                        }
+                    }
+                });
+                chooser.show(man, "bla");
+                return true;
+            }
+        });
 
         if (wallPhotos.size() > 0) {
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
             setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
+            setOnImageLongClick(customViewHolder.mainImage, wallPhotos.get(0));
         } else {
             customViewHolder.mainImage.setImageResource(android.R.color.transparent);
         }
     }
 
-    private void fillNoPhotoMainHolder(WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
+    private void fillNoPhotoMainHolder(final WallPostModel wallPost, RecyclerView.ViewHolder viewHolder, int i) {
         NoPhotoMainHolder customViewHolder = (NoPhotoMainHolder) viewHolder;
+
+        customViewHolder.textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String [] items = {"Скопировать в буфер"};
+                AppCompatActivity a = (AppCompatActivity) mContext;
+                FragmentManager man = a.getSupportFragmentManager();
+
+                WallPostChooser chooser = WallPostChooser.newInstance(items);
+                chooser.setmClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("label", wallPost.getText());
+                                clipboard.setPrimaryClip(clip);
+                                break;
+                            default:
+                        }
+                    }
+                });
+                chooser.show(man, "bla");
+                return true;
+            }
+        });
 
         if (wallPost.getText().contains("href")) {
             customViewHolder.textView.setText(Html.fromHtml(wallPost.getText()));
@@ -311,6 +400,33 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         ArrayList<String> wallPhotos = wallPost.getPostPhotos();
 
+        final String postText = wallPost.getText();
+        customViewHolder.textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String [] items = {"Скопировать в буфер"};
+                AppCompatActivity a = (AppCompatActivity) mContext;
+                FragmentManager man = a.getSupportFragmentManager();
+
+                WallPostChooser chooser = WallPostChooser.newInstance(items);
+                chooser.setmClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("label", postText);
+                                clipboard.setPrimaryClip(clip);
+                                break;
+                            default:
+                        }
+                    }
+                });
+                chooser.show(man, "bla");
+                return true;
+            }
+        });
+
         if (wallPhotos.size() > 0) {
             customViewHolder.smallImage2.setVisibility(View.GONE);
             customViewHolder.smallImage3Wrapper.setVisibility(View.GONE);
@@ -326,20 +442,24 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     case 0:
                         Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
                         setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
+                        setOnImageLongClick(customViewHolder.mainImage, wallPhotos.get(0));
                         break;
                     case 1:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
                         setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
+                        setOnImageLongClick(customViewHolder.smallImage1, wallPhotos.get(1));
                         break;
                     case 2:
                         customViewHolder.smallImage2.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
                         setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
+                        setOnImageLongClick(customViewHolder.smallImage2, wallPhotos.get(2));
                         break;
                     case 3:
                         customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
+                        setOnImageLongClick(customViewHolder.smallImage3, wallPhotos.get(3));
                         if (wallPhotos.size() > 4) {
                             customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
                             customViewHolder.alphaView.setVisibility(View.VISIBLE);
@@ -372,20 +492,24 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     case 0:
                         Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
                         setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
+                        setOnImageLongClick(customViewHolder.mainImage, wallPhotos.get(0));
                         break;
                     case 1:
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage1);
                         setOnImageClick(customViewHolder.smallImage1, wallPhotos, 1);
+                        setOnImageLongClick(customViewHolder.smallImage1, wallPhotos.get(1));
                         break;
                     case 2:
                         customViewHolder.smallImage2.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage2);
                         setOnImageClick(customViewHolder.smallImage2, wallPhotos, 2);
+                        setOnImageLongClick(customViewHolder.smallImage2, wallPhotos.get(2));
                         break;
                     case 3:
                         customViewHolder.smallImage3Wrapper.setVisibility(View.VISIBLE);
                         Picasso.with(mContext).load(url).into(customViewHolder.smallImage3);
                         setOnImageClick(customViewHolder.smallImage3, wallPhotos, 3);
+                        setOnImageLongClick(customViewHolder.smallImage3, wallPhotos.get(3));
                         if (wallPhotos.size() > 4) {
                             customViewHolder.morePhoto.setText("+" + (wallPhotos.size() - 4));
                             customViewHolder.alphaView.setVisibility(View.VISIBLE);
@@ -405,6 +529,7 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             String url = wallPhotos.get(0);
             Picasso.with(mContext).load(url).into(customViewHolder.mainImage);
             setOnImageClick(customViewHolder.mainImage, wallPhotos, 0);
+            setOnImageLongClick(customViewHolder.mainImage, wallPhotos.get(0));
         }
     }
 
@@ -486,5 +611,4 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             super(itemView);
         }
     }
-
 }
