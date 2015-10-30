@@ -1,11 +1,14 @@
 package com.randomname.vkjokes.Fragments;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -35,7 +38,9 @@ import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Views.TouchImageView;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -186,7 +191,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                Toast.makeText(getActivity(), "Bla", Toast.LENGTH_SHORT).show();
+                savePhotoToDisc();
                 return false;
             default:
                 break;
@@ -206,6 +211,33 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     public void onPause() {
         b = loadBitmapFromView(getView());
         super.onPause();
+    }
+
+    private void savePhotoToDisc() {
+        String url = wallPhotos.get(viewPager.getCurrentItem() - 1);
+        String title = System.currentTimeMillis() + ".jpg";
+
+        File direct = new File(Environment.getExternalStorageDirectory()
+                + "/vk_jokes");
+
+        if (!direct.exists()) {
+            direct.mkdirs();
+        }
+
+        DownloadManager mgr = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+
+        Uri downloadUri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(
+                downloadUri);
+
+        request.setAllowedNetworkTypes(
+                DownloadManager.Request.NETWORK_WIFI
+                        | DownloadManager.Request.NETWORK_MOBILE)
+                .setAllowedOverRoaming(false).setTitle("Vk jokes")
+                .setDescription("Сохранение картинки")
+                .setDestinationInExternalPublicDir("/vk_jokes", title);
+
+        mgr.enqueue(request);
     }
 
     public static Bitmap loadBitmapFromView(View v) {
