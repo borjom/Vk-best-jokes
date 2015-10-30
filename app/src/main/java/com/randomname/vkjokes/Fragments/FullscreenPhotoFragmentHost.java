@@ -217,7 +217,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         String url = wallPhotos.get(viewPager.getCurrentItem() - 1);
         String title = System.currentTimeMillis() + ".jpg";
 
-        File direct = new File(Environment.getExternalStorageDirectory()
+        File direct = new File(Environment.DIRECTORY_PICTURES
                 + "/vk_jokes");
 
         if (!direct.exists()) {
@@ -235,7 +235,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
                         | DownloadManager.Request.NETWORK_MOBILE)
                 .setAllowedOverRoaming(false).setTitle("Vk jokes")
                 .setDescription("Сохранение картинки")
-                .setDestinationInExternalPublicDir("/vk_jokes", title);
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + "/vk_jokes", title);
 
         mgr.enqueue(request);
     }
