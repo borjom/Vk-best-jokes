@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.randomname.vkjokes.Adapters.WallPostsAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
@@ -79,7 +81,7 @@ public class PublicListFragment extends Fragment {
 
     private int offset = 0;
     private boolean loading = false;
-    private String currentPublic = "mdk";
+    private String currentPublic = "onlyorly";
     private int currentPublicId = 0;
 
     @Bind(R.id.wall_posts_recycler_view)
@@ -115,7 +117,6 @@ public class PublicListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.public_list_fragment, container, false);
         ButterKnife.bind(this, view);
-
         String[] publicUrls = getResources().getStringArray(R.array.public_url);
         currentPublic = publicUrls[0];
 
@@ -124,7 +125,7 @@ public class PublicListFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences(
                 Constants.SHARED_PREFERENCES.PREF_NAME, Context.MODE_PRIVATE);
 
-        currentPublic = prefs.getString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, "mdk");
+        currentPublic = prefs.getString(Constants.SHARED_PREFERENCES.CURRENT_PUBLIC, "onlyorly");
 
         TypedValue tv = new TypedValue();
         if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {

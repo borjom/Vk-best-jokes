@@ -54,9 +54,6 @@ public class FullscreenPhotoFragmentHost extends Fragment {
 
     private FragmentsCallbacks publicListFragmentCallback;
 
-    private MenuItem saveMenuItem;
-    private ImageView saveMenuItemActionView;
-
     private ArrayList<String> wallPhotos;
     private int position;
 
@@ -122,8 +119,6 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);
 
-        saveMenuItemActionView = (ImageView)inflater.inflate(R.layout.save_icon_action_view, null);
-
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -133,19 +128,10 @@ public class FullscreenPhotoFragmentHost extends Fragment {
                         publicListFragmentCallback.onPhotoFragmentPageSlide(positionOffset);
                         mainLayout.setAlpha(positionOffset);
 
-                        if (saveMenuItem.getActionView() == null) {
-                            saveMenuItem.setActionView(saveMenuItemActionView);
-                        }
-
-                        saveMenuItem.getActionView().setAlpha(positionOffset);
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    if (saveMenuItem.getActionView() != null) {
-                        getActivity().invalidateOptionsMenu();
-                    }
                     try {
                         publicListFragmentCallback.onPhotoPageStop();
                     } catch (Exception e) {
@@ -183,7 +169,6 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fullscreen_menu, menu);
-        saveMenuItem = menu.findItem(R.id.action_save);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

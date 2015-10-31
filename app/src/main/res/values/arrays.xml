@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="public_url">
-        <item>mdk</item>
         <item>onlyorly</item>
         <item>fuck_humor</item>
         <item>leprum</item>
@@ -19,7 +18,6 @@
     </string-array>
 
     <integer-array name="public_ids">
-        <item>-10639516</item>
         <item>-36775802</item>
         <item>-12382740</item>
         <item>-30022666</item>
@@ -37,7 +35,6 @@
     </integer-array>
 
     <string-array name="public_name">
-        <item>МДК</item>
         <item>Орлёнок</item>
         <item>ЁП</item>
         <item>Лепра</item>
