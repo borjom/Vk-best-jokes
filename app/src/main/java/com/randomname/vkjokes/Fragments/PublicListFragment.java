@@ -8,28 +8,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.SystemClock;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.NumberPicker;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.randomname.vkjokes.Adapters.WallPostsAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
@@ -40,7 +29,6 @@ import com.randomname.vkjokes.Util.Constants;
 import com.randomname.vkjokes.Util.Misc;
 import com.randomname.vkjokes.Util.StringUtils;
 import com.randomname.vkjokes.Views.PreCachingLayoutManager;
-import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -48,23 +36,16 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiPhoto;
 import com.vk.sdk.api.model.VKApiPost;
-import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKAttachments;
-import com.vk.sdk.api.model.VKCommentArray;
-import com.vk.sdk.api.model.VKList;
 import com.vk.sdk.api.model.VKPostArray;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class PublicListFragment extends Fragment {
 
@@ -253,6 +234,7 @@ public class PublicListFragment extends Fragment {
         db.setTransactionSuccessful();
         db.endTransaction();
     }
+
 
     private void getWallPostsFromSQL() {
         Cursor c = getActivity().getContentResolver().query(VkJokesContentProvider.CONTENT_URI, null, null, null, null);

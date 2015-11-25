@@ -22,7 +22,7 @@ public class PublicsApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));
+        SystemClock.sleep(TimeUnit.SECONDS.toMillis(1));
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(this);
     }
