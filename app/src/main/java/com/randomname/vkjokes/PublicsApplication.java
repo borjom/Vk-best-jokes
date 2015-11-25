@@ -1,10 +1,13 @@
 package com.randomname.vkjokes;
 
 import android.app.Application;
+import android.os.SystemClock;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKSdk;
+
+import java.util.concurrent.TimeUnit;
 
 public class PublicsApplication extends Application {
 
@@ -19,6 +22,7 @@ public class PublicsApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(this);
     }
