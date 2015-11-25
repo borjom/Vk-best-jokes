@@ -5,15 +5,12 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,32 +18,19 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.nineoldandroids.animation.AnimatorSet;
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewHelper;
 import com.randomname.vkjokes.Adapters.PhotosAdapter;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.R;
-import com.randomname.vkjokes.Views.TouchImageView;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnPageChange;
-import butterknife.OnTouch;
 
 public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String PHOTOS_ARRAY_KEY = "photos_array_key";
@@ -221,7 +205,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
                 .setAllowedOverRoaming(false).setTitle("Vk jokes")
                 .setDescription("Сохранение картинки")
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + "/vk_jokes", title);
-
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         mgr.enqueue(request);
     }
 
