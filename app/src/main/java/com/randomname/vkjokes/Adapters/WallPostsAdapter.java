@@ -1,36 +1,28 @@
 package com.randomname.vkjokes.Adapters;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.randomname.vkjokes.Fragments.PublicListFragment;
-import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.Fragments.WallPostChooser;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
-import com.randomname.vkjokes.MainActivity;
 import com.randomname.vkjokes.Models.WallPostModel;
 import com.randomname.vkjokes.R;
 import com.randomname.vkjokes.Util.StringUtils;
-import com.randomname.vkjokes.Views.ProportionalImageView;
 import com.randomname.vkjokes.Views.WallPostViewHolder;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
@@ -38,12 +30,6 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiVideo;
-import com.vk.sdk.api.model.VKList;
-import com.vk.sdk.api.model.VKPostArray;
-
-import org.json.JSONException;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -148,7 +134,15 @@ public class WallPostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         holder.dateTextView.setText(dateString);
+        holder.commentCountTextView.setText(commentCount);
         holder.likeCountTextView.setText(String.valueOf(wallPost.getLikeCount()));
+
+        holder.commentCountTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callbacks.onCommentsClick(wallPost);
+            }
+        });
 
         if (wallPost.getAlreadyLiked()) {
             holder.likeButton.setImageResource(R.drawable.active_like);
