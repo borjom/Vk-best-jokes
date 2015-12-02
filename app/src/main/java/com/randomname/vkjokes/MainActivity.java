@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -220,17 +222,40 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     @Override
     public void onBackPressed() {
-        if(materialDrawer.isDrawerOpen()) {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            quitDialog();
+        } else {
+            if (transitionOffset == 2.0f) {
+                materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 0);
+                closeFullscreen(false);
+                if (!toolbarShown) {
+                    showToolbar();
+                }
+                super.onBackPressed();
+            }
+        }
+
+        if (materialDrawer != null && materialDrawer.isDrawerOpen()) {
             materialDrawer.closeDrawer();
-        } else if(transitionOffset == 2.0f) {
-            closeFullscreen(false);
-            super.onBackPressed();
         }
 
         if ((MaterialMenuDrawable.IconState.ARROW) != null && settingsFragment != null) {
             materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 0);
             setNewToolbarTitle(oldTitle);
         }
+    }
+
+    private void quitDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage("Вы хотите выйти?")
+                .setCancelable(false)
+                .setPositiveButton("Да",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int id) {
+                                finish();
+                            }
+                        }).setNegativeButton("Нет", null).show();
     }
 
     private void initToolbar() {
