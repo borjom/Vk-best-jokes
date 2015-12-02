@@ -1,7 +1,19 @@
 <resources>
     <string name="app_name">Приколы ВК</string>
-    <string name="action_settings">Настройки</string>
+    <string name="settings">Настройки</string>
+    <string name="help">Помощь</string>
+    <string name="help_publish_text">FAQ по приложению</string>
     <string name="banner_ad_unit_id">ca-app-pub-8651995286402993/1569834865</string>
+    <!--Settings-->
+    <string name="s_wall">Стена</string>
+    <string name="s_dimg">Загружать картинки</string>
+    <string name="s_updt_msg">Автоматическое обновление</string>
+    <string name="s_min">Мини-видеоплеер</string>
+    <string name="s_diz">Дизайн</string>
+    <string name="s_fon_cht">Фон чата</string>
+    <string name="s_color">Цвет приложения</string>
+    <string name="s_ak">Аккаунт</string>
+    <string name="s_exit">Выйти из аккаунта</string>
 
     <integer name="com_vk_sdk_AppId">5114175</integer>
 </resources>

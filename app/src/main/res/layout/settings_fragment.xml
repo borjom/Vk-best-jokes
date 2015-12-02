@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <include layout="@layout/toolbar"
+        android:id="@+id/include2" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/post"
+        android:id="@+id/scrollView" >
+
+        <LinearLayout
+            android:background="@color/list"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:background="@color/post"
+                android:orientation="vertical"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/s_wall"
+                    android:id="@+id/message_category"
+                    android:paddingTop="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingBottom="6dp"
+                    android:textColor="@color/mainCategory"
+                    android:textSize="16sp"
+                    android:layout_gravity="left"
+                    android:layout_marginEnd="10dp" />
+
+                <LinearLayout
+                    android:background="@drawable/lits_item"
+                    android:padding="16dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/image_click"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/s_dimg"
+                        android:textSize="16sp"
+                        android:id="@+id/image_text" />
+
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/image_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:checked="true"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:background="@drawable/lits_item"
+                    android:padding="16dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/load_click"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/s_updt_msg"
+                        android:textSize="16sp"
+                        android:id="@+id/load_text" />
+
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/load_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:checked="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:background="@drawable/lits_item"
+                    android:padding="16dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/videoPlayer_click"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/s_min"
+                        android:textSize="16sp"
+                        android:id="@+id/videoPlayer_text" />
+
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/videoPlayer_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:checked="true"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="@color/post"
+                android:orientation="vertical"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="100dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/s_ak"
+                    android:id="@+id/account_category"
+                    android:paddingTop="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingBottom="6dp"
+                    android:textColor="@color/mainCategory"
+                    android:textSize="16sp"
+                    android:layout_gravity="left|end" />
+
+                <LinearLayout
+                    android:background="@drawable/lits_item"
+                    android:padding="16dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/exit_click"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/s_exit"
+                        android:textSize="16sp"
+                        android:id="@+id/exit_text" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

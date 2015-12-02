@@ -8,4 +8,8 @@
     <color name="text_color">#000000</color>
     <color name="full_screen_photo_color">#000000</color>
     <color name="splash">#3E6FA9</color>
+
+    <color name="post">#ffffff</color>
+    <color name="list">#3E6FA9</color>
+    <color name="mainCategory">#4c545e</color>
 </resources>
