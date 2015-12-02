@@ -12,4 +12,7 @@
     <color name="post">#ffffff</color>
     <color name="list">#3E6FA9</color>
     <color name="mainCategory">#4c545e</color>
+
+    <color name="textColorProfile">#414346</color>
+    <color name="postLikeTextPressed">#60758e</color>
 </resources>

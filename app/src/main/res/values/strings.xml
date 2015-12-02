@@ -9,11 +9,10 @@
     <string name="s_dimg">Загружать картинки</string>
     <string name="s_updt_msg">Автоматическое обновление</string>
     <string name="s_min">Мини-видеоплеер</string>
-    <string name="s_diz">Дизайн</string>
-    <string name="s_fon_cht">Фон чата</string>
-    <string name="s_color">Цвет приложения</string>
     <string name="s_ak">Аккаунт</string>
     <string name="s_exit">Выйти из аккаунта</string>
+    <string name="add_comment">Добавить комментарий</string>
+    <string name="send_button_caption">Отправить</string>
 
     <integer name="com_vk_sdk_AppId">5114175</integer>
 </resources>

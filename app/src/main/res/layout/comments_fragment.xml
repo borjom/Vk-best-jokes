@@ -12,4 +12,45 @@
         class="android.support.v7.widget.RecyclerView"
         />
 
+    <RelativeLayout
+        android:padding="10.0dip"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/comments_recycler_view"
+        android:background="@color/post" >
+        <EditText
+            android:textStyle="italic"
+            android:textColor="@color/textColorProfile"
+            android:id="@+id/postText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_comment"
+            android:maxLines="3"
+            android:maxLength="@integer/max_comment_length"
+            android:layout_toLeftOf="@+id/sendButton"
+            android:layout_toStartOf="@+id/sendButton"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:inputType="textCapSentences|textAutoCorrect|textNoSuggestions|textAutoComplete|textMultiLine" />
+        <Button
+            android:textStyle="italic"
+            android:textColor="@android:color/white"
+            android:id="@id/sendButton"
+            android:background="@color/postLikeTextPressed"
+            android:paddingLeft="10.0dip"
+            android:paddingRight="10.0dip"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10.0dip"
+            android:layout_marginStart="10.0dip"
+            android:text="@string/send_button_caption"
+            android:layout_alignTop="@id/postText"
+            android:layout_alignBottom="@id/postText"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
 </RelativeLayout>

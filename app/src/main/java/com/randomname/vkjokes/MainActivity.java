@@ -554,6 +554,8 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
             FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.stay_still);
 
+            materialDrawer.keyboardSupportEnabled(MainActivity.this, true);
+
             Bundle data = new Bundle();
             data.putParcelable(CommentsFragment.WALL_POST_MODEL_KEY, wallPostModel);
 
