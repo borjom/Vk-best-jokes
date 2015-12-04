@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,7 +15,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -31,6 +29,8 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
+import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
+import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -246,16 +246,33 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     }
 
     private void quitDialog() {
-        new AlertDialog.Builder(this)
-                .setMessage("Вы хотите выйти?")
-                .setCancelable(false)
-                .setPositiveButton("Да",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int id) {
-                                finish();
-                            }
-                        }).setNegativeButton("Нет", null).show();
+        final NiftyDialogBuilder dialogBuilder = NiftyDialogBuilder.getInstance(this);
+        Effectstype effect = Effectstype.Slidetop;
+        dialogBuilder
+                .withTitle("Выход")
+                .withTitleColor("#3E75B6")
+                .withDividerColor("#3E75B6")
+                .withMessage("Выйти из приложения?")
+                .withMessageColor("#ffffff")
+                .withDialogColor("#3E75B6")
+                 //.withIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_exit null))
+                .withDuration(350)
+                .withEffect(effect)
+                .withButton1Text("Да")
+                .withButton2Text("Нет")
+                .setButton1Click(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                })
+                .setButton2Click(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogBuilder.dismiss();
+                    }
+                })
+                .show();
     }
 
     private void initToolbar() {

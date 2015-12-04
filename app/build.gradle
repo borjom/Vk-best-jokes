@@ -33,4 +33,6 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.0.1'
     compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.1'
     compile 'com.google.android.gms:play-services-ads:8.1.0'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.github.sd6352051.niftydialogeffects:niftydialogeffects:1.0.0@aar'
 }
