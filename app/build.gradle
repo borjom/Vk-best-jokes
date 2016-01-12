@@ -10,6 +10,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        renderscriptTargetApi 20
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -33,4 +35,5 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.0.1'
     compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.1'
     compile 'com.google.android.gms:play-services-ads:8.1.0'
+    compile 'tk.zielony:carbon:0.11.0'
 }

@@ -18,6 +18,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -25,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
@@ -59,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     private final static String TOOLBAR_TITLE_STATE = "toolbar_title_state";
     private final static String TOOLBAR_OLD_TITLE_STATE = "toolbar_old_title_state";
     private final static String TOOLBAR_IS_SHOWN = "toolbar_is_shown";
+
+    private static final int TIME_INTERVAL = 1000; // # milliseconds, desired time passed between two back presses.
+    private long mBackPressed;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -181,11 +186,22 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     @Override
     public void onBackPressed() {
+        Log.e("Bla", "" + transitionOffset);
         if(materialDrawer.isDrawerOpen()) {
             materialDrawer.closeDrawer();
         } else if(transitionOffset == 2.0f) {
-            closeFullscreen(false);
-            super.onBackPressed();
+            if (closeFullscreen(false)) {
+                super.onBackPressed();
+            } else {
+                if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                    super.onBackPressed();
+                    return;
+                } else {
+                    Toast.makeText(this, R.string.press_back_again_to_exit, Toast.LENGTH_SHORT).show();
+                }
+
+                mBackPressed = System.currentTimeMillis();
+            }
         }
     }
 
@@ -200,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         materialDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .withHeader(R.layout.drawer_header)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

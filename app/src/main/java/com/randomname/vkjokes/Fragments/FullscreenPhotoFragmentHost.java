@@ -2,7 +2,11 @@ package com.randomname.vkjokes.Fragments;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -51,6 +55,37 @@ import butterknife.OnTouch;
 public class FullscreenPhotoFragmentHost extends Fragment {
     public final static String PHOTOS_ARRAY_KEY = "photos_array_key";
     public final static String POSITION_KEY = "position_key";
+
+    private String downloadCompleteIntentName = DownloadManager.ACTION_DOWNLOAD_COMPLETE;
+    private IntentFilter downloadCompleteIntentFilter = new IntentFilter(downloadCompleteIntentName);
+    private long downloadId = -1;
+
+    private BroadcastReceiver downloadCompleteReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0L);
+            if (id != downloadId) {
+                return;
+            }
+
+            DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            DownloadManager.Query query = new DownloadManager.Query();
+            query.setFilterById(id);
+            Cursor cursor = downloadManager.query(query);
+
+            // it shouldn't be empty, but just in case
+            if (!cursor.moveToFirst()) {
+                return;
+            }
+
+            int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+            if (DownloadManager.STATUS_SUCCESSFUL != cursor.getInt(statusIndex)) {
+                Toast.makeText(getActivity(), getString(R.string.download_failed), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(getActivity(), getString(R.string.download_completed), Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private FragmentsCallbacks publicListFragmentCallback;
 
@@ -108,6 +143,7 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         }
 
         setNewTitle();
+        getActivity().registerReceiver(downloadCompleteReceiver, downloadCompleteIntentFilter);
     }
 
     @Override
@@ -218,11 +254,12 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         request.setAllowedNetworkTypes(
                 DownloadManager.Request.NETWORK_WIFI
                         | DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false).setTitle("Vk jokes")
+                .setAllowedOverRoaming(false).setTitle(getString(R.string.app_name))
                 .setDescription("Сохранение картинки")
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + "/vk_jokes", title);
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES + "/vk_jokes", title)
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
-        mgr.enqueue(request);
+        downloadId = mgr.enqueue(request);
     }
 
     public static Bitmap loadBitmapFromView(View v) {
@@ -240,6 +277,12 @@ public class FullscreenPhotoFragmentHost extends Fragment {
         dummyBackground.setImageBitmap(b);
         b = null;
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        getActivity().unregisterReceiver(downloadCompleteReceiver);
+        super.onDestroy();
     }
 
     private void setNewTitle() {
