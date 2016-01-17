@@ -7,5 +7,6 @@
     <string name="download_failed">Не удалось сохранить картинку</string>
     <string name="download_completed">Картинка успешно сохранена</string>
     <string name="press_back_again_to_exit">Нажмите еще раз для выхода</string>
+    <string name="settings">Настройки</string>
 
 </resources>

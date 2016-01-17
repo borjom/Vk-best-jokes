@@ -204,8 +204,9 @@ public class FullscreenPhotoFragmentHost extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fullscreen_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.fullscreen_menu, menu);
     }
 
     @Override
@@ -235,7 +236,12 @@ public class FullscreenPhotoFragmentHost extends Fragment {
     }
 
     private void savePhotoToDisc() {
-        String url = wallPhotos.get(viewPager.getCurrentItem() - 1);
+        int index = viewPager.getCurrentItem() - 1;
+        if (index < 0 || index >= wallPhotos.size()) {
+            return;
+        }
+
+        String url = wallPhotos.get(index);
         String title = System.currentTimeMillis() + ".jpg";
 
         File direct = new File(Environment.DIRECTORY_PICTURES

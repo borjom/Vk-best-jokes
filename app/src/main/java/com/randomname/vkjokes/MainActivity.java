@@ -17,6 +17,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,6 +42,7 @@ import com.randomname.vkjokes.Fragments.CommentsFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragment;
 import com.randomname.vkjokes.Fragments.FullscreenPhotoFragmentHost;
 import com.randomname.vkjokes.Fragments.PublicListFragment;
+import com.randomname.vkjokes.Fragments.SettingsFragment;
 import com.randomname.vkjokes.Fragments.VkLoginAlert;
 import com.randomname.vkjokes.Interfaces.FragmentsCallbacks;
 import com.randomname.vkjokes.Models.WallPostModel;
@@ -51,7 +54,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements FragmentsCallbacks {
+public class MainActivity extends AppCompatActivity implements FragmentsCallbacks, PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 
     private final static String FULLSCREEN_FRAGMENT_TAG = "full_screen_tag";
     private final static String COMMENTS_FRAGMENT_TAG = "comments_fragment_tag";
@@ -186,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
     @Override
     public void onBackPressed() {
-        Log.e("Bla", "" + transitionOffset);
         if(materialDrawer.isDrawerOpen()) {
             materialDrawer.closeDrawer();
         } else if(transitionOffset == 2.0f) {
@@ -216,19 +218,22 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         materialDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withHeader(R.layout.drawer_header)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        materialDrawer.closeDrawer();
-                        publicListFragment.changePublic(publicUrls[position], publicIds[position]);
-                        title = publicNames[position];
-                        oldTitle = title;
-                        setNewToolbarTitle(title);
-                        if (!toolbarShown) {
-                            showToolbar();
+                        if (drawerItem.getType().equals("PRIMARY_ITEM")) {
+                            materialDrawer.closeDrawer();
+                            publicListFragment.changePublic(publicUrls[position], publicIds[position]);
+                            title = publicNames[position];
+                            oldTitle = title;
+                            setNewToolbarTitle(title);
+                            if (!toolbarShown) {
+                                showToolbar();
+                            }
+                            return true;
                         }
-                        return true;
+
+                        return false;
                     }
                 })
                 .build();
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         });
 
         Animation in = AnimationUtils.loadAnimation(this, R.anim.stay_still);
-        Animation out = AnimationUtils.loadAnimation(this,R.anim.stay_still);
+        Animation out = AnimationUtils.loadAnimation(this, R.anim.stay_still);
 
         toolbarTitleSwitcher.setInAnimation(in);
         toolbarTitleSwitcher.setOutAnimation(out);
@@ -312,6 +317,9 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
                 return true;
             case COMMENTS_FRAGMENT_TAG:
                 closeCommentFragment(toClose, frag);
+                return true;
+            case SettingsFragment.FRAGMENT_TAG:
+                closeSettingsFragment(toClose, frag);
                 return true;
             default:
                 return false;
@@ -355,6 +363,23 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.stay_still, R.anim.slide_out_top);
+            ft.hide(frag);
+            ft.commit();
+
+            if (toClose) {
+                getSupportFragmentManager().popBackStack();
+            }
+
+            setNewToolbarTitle(oldTitle);
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER, false);
+        }
+    }
+
+    private void closeSettingsFragment(boolean toClose, Fragment frag) {
+        if (frag != null) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.stay_still, R.anim.slide_out_right);
             ft.hide(frag);
             ft.commit();
 
@@ -603,5 +628,38 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
         if((toolbarShown && offset > 0) || (!toolbarShown && offset < 0)) {
             scrolledDistance += offset;
         }
+    }
+
+    @Override
+    public void showSettings() {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentByTag(SettingsFragment.FRAGMENT_TAG);
+        if (fragment == null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setCustomAnimations(R.anim.slide_in_right, R.anim.stay_still);
+
+            fragment = new SettingsFragment();
+            ft.add(R.id.main_frame, fragment, SettingsFragment.FRAGMENT_TAG);
+            ft.addToBackStack(SettingsFragment.FRAGMENT_TAG);
+            ft.commit();
+            getSupportFragmentManager().executePendingTransactions();
+
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW, false);
+            setNewToolbarTitle(getString(R.string.settings));
+
+        }
+    }
+
+    @Override
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat preferenceFragmentCompat, PreferenceScreen preferenceScreen) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        SettingsFragment fragment = new SettingsFragment();
+        Bundle args = new Bundle();
+        args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.getKey());
+        fragment.setArguments(args);
+        ft.add(R.id.main_frame, fragment, preferenceScreen.getKey());
+        ft.addToBackStack(preferenceScreen.getKey());
+        ft.commit();
+        return true;
     }
 }

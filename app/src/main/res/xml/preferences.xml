@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference
+        android:layout="@layout/public_recycler_header"
+        />
+
+    <Preference
+        android:key="pref_static_field_key"
+        android:selectable="false"
+        android:title="you can omit the title"
+        android:summary="Multi line description\ncan go here."/>
+
+</PreferenceScreen>

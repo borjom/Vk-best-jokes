@@ -12,4 +12,5 @@ public interface FragmentsCallbacks {
     public void onPhotoPageStop();
     public void onPhotoClick();
     public void onPageScroll(int offset);
+    public void showSettings();
 }
