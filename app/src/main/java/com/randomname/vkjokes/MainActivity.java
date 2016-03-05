@@ -139,41 +139,6 @@ public class MainActivity extends AppCompatActivity implements FragmentsCallback
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        switch (item.getItemId())
-        {
-            case R.id.settings:
-                materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 1);
-                settingsFragment = new SettingsFragment();
-                ft.add(R.id.main_frame, settingsFragment, "SettingsFragment");
-                ft.addToBackStack(null);
-                ft.commit();
-                setNewToolbarTitle("Настройки");
-                break;
-            case R.id.help:
-                materialMenu.setTransformationOffset(MaterialMenuDrawable.AnimationState.BURGER_ARROW, 1);
-                helpFragment = new HelpFragment();
-                ft.add(R.id.main_frame, helpFragment, "HelpFragment");
-                ft.addToBackStack(null);
-                ft.commit();
-                setNewToolbarTitle("Помощь");
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         int color = Color.TRANSPARENT;
         String iconStateString;
